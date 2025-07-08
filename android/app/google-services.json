@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "255827182732",
+    "project_id": "ibilling-9961c",
+    "storage_bucket": "ibilling-9961c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255827182732:android:5d5e0af17ee1e72e1a27a9",
+        "android_client_info": {
+          "package_name": "com.ibilling.ibilling"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBreX4qp27L_zTA_JJUF3GsRJWvKxiyvDc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
