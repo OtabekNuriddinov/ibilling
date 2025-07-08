@@ -26,4 +26,5 @@ class ContractEntity {
     required this.status,
     required this.statusLabel,
   });
+
 }

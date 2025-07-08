@@ -4,24 +4,30 @@ enum ContractListStatus {initial, loading, success, failure}
 
 class ContractState {
   final List<ContractEntity> contracts;
-  final ContractListStatus status;
+  final bool isLoading;
   final String? error;
+  final ContractListStatus status;
 
   const ContractState({
     this.contracts = const [],
-    this.status = ContractListStatus.initial,
+    this.isLoading = false,
     this.error,
+    this.status = ContractListStatus.initial,
   });
 
   ContractState copyWith({
     List<ContractEntity>? contracts,
-    ContractListStatus? status,
+    bool? isLoading,
     String? error,
+    ContractListStatus? status,
   }) {
     return ContractState(
       contracts: contracts ?? this.contracts,
-      status: status ?? this.status,
+      isLoading: isLoading ?? this.isLoading,
       error: error,
+      status: status ?? this.status,
     );
   }
+
+  factory ContractState.initial() => ContractState();
 }

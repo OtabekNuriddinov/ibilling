@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:ibilling/core/theme/app_text_styles.dart';
-import 'package:ibilling/features/ibilling/data/model/contract_model.dart';
-import 'package:ibilling/features/ibilling/data/model/invoice_model.dart';
 import 'package:ibilling/features/ibilling/domain/entities/contract_entity.dart';
 import 'package:ibilling/features/ibilling/domain/entities/invoice_entity.dart';
 import 'package:sizer/sizer.dart';

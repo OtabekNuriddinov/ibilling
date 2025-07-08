@@ -1,11 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:ibilling/barrel.dart';
-import '../widgets/no_made_widget.dart';
-import '../widgets/selectable_card.dart';
 import '../barrel.dart';
-import 'package:ibilling/features/ibilling/data/datasources/ibilling_local_datasource.dart';
-import 'package:ibilling/features/ibilling/domain/entities/contract_entity.dart';
-import 'package:ibilling/features/ibilling/domain/entities/invoice_entity.dart';
 
 class ContractsPage extends StatefulWidget {
   const ContractsPage({super.key});
@@ -14,7 +8,8 @@ class ContractsPage extends StatefulWidget {
   State<ContractsPage> createState() => _ContractsPageState();
 }
 
-class _ContractsPageState extends State<ContractsPage> {
+class _ContractsPageState extends State<ContractsPage>
+    with AutomaticKeepAliveClientMixin {
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
   int selectedIndex = 0;
@@ -22,14 +17,18 @@ class _ContractsPageState extends State<ContractsPage> {
   final List<ContractEntity> _contracts = [];
   bool _isLoading = false;
   bool _hasReachedMax = false;
-  String? _error;
   int _currentPage = 1;
   final int _pageSize = 10;
+  String? _error;
   final ScrollController _scrollController = ScrollController();
 
   final List<InvoiceEntity> _invoices = [];
   bool _isInvoiceLoading = false;
   String? _invoiceError;
+  int _invoicePage = 1;
+  final int _invoicePageSize = 10;
+  bool _hasReachedMaxInvoices = false;
+  final ScrollController _invoiceScrollController = ScrollController();
 
   @override
   void initState() {
@@ -40,21 +39,34 @@ class _ContractsPageState extends State<ContractsPage> {
       });
     });
     _loadContracts();
-    _loadInvoices();
     _scrollController.addListener(_onScroll);
+    _invoiceScrollController.addListener(_onInvoiceScroll);
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _invoiceScrollController.dispose();
     super.dispose();
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
       if (!_isLoading && !_hasReachedMax && selectedIndex == 0) {
         _loadContracts();
+      }
+    }
+  }
+
+  void _onInvoiceScroll() {
+    if (_invoiceScrollController.position.pixels >=
+        _invoiceScrollController.position.maxScrollExtent - 200) {
+      if (!_isInvoiceLoading && !_hasReachedMaxInvoices && selectedIndex == 1) {
+        _loadInvoices();
       }
     }
   }
@@ -69,6 +81,11 @@ class _ContractsPageState extends State<ContractsPage> {
             contract.date.month == _selectedDay.month &&
             contract.date.day == _selectedDay.day;
       }).toList();
+      filtered.sort(
+        (a, b) => (int.tryParse(a.id ?? '0') ?? 0).compareTo(
+          int.tryParse(b.id ?? '0') ?? 0,
+        ),
+      );
       final start = (_currentPage - 1) * _pageSize;
       final newContracts = filtered.skip(start).take(_pageSize).toList();
       setState(() {
@@ -85,47 +102,55 @@ class _ContractsPageState extends State<ContractsPage> {
     }
   }
 
-  Future<void> _loadInvoices() async {
+  Future<void> _onRefresh() async {
     setState(() {
-      _isInvoiceLoading = true;
-      _invoiceError = null;
-      _invoices.clear();
+      _contracts.clear();
+      _currentPage = 1;
+      _hasReachedMax = false;
+      _error = null;
     });
+    await _loadContracts();
+  }
+
+  Future<void> _loadInvoices() async {
+    setState(() => _isInvoiceLoading = true);
     try {
       final getInvoices = getIt<GetInvoices>();
       final allInvoices = await getInvoices();
-      final filtered = allInvoices
-          .where(
-            (invoice) =>
-                invoice.date.year == _selectedDay.year &&
-                invoice.date.month == _selectedDay.month &&
-                invoice.date.day == _selectedDay.day,
-          )
+      allInvoices.sort(
+        (a, b) => (int.tryParse(a.id ?? '0') ?? 0).compareTo(
+          int.tryParse(b.id ?? '0') ?? 0,
+        ),
+      );
+      final start = (_invoicePage - 1) * _invoicePageSize;
+      final newInvoices = allInvoices
+          .skip(start)
+          .take(_invoicePageSize)
           .toList();
       setState(() {
-        _invoices.addAll(filtered);
+        _invoices.addAll(newInvoices);
         _isInvoiceLoading = false;
+        _invoicePage++;
+        if (newInvoices.length < _invoicePageSize)
+          _hasReachedMaxInvoices = true;
+        _invoiceError = null;
       });
     } catch (e) {
       setState(() {
-        _invoiceError = e.toString();
         _isInvoiceLoading = false;
+        _invoiceError = e.toString();
       });
     }
   }
 
-  Future<void> _onRefresh() async {
-    if (selectedIndex == 0) {
-      setState(() {
-        _contracts.clear();
-        _error = null;
-        _currentPage = 1;
-        _hasReachedMax = false;
-      });
-      await _loadContracts();
-    } else {
-      await _loadInvoices();
-    }
+  Future<void> _onRefreshInvoices() async {
+    setState(() {
+      _invoices.clear();
+      _invoicePage = 1;
+      _hasReachedMaxInvoices = false;
+      _invoiceError = null;
+    });
+    await _loadInvoices();
   }
 
   void _onDaySelected(DateTime selected, DateTime focused) {
@@ -135,14 +160,13 @@ class _ContractsPageState extends State<ContractsPage> {
       _contracts.clear();
       _currentPage = 1;
       _hasReachedMax = false;
-      _invoices.clear();
     });
     _loadContracts();
-    _loadInvoices();
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: CommonMethods.customAppBar(
         backColor: AppColors.black,
@@ -216,6 +240,9 @@ class _ContractsPageState extends State<ContractsPage> {
                           onPressed: () {
                             setState(() {
                               selectedIndex = 1;
+                              _invoices.clear();
+                              _invoicePage = 1;
+                              _hasReachedMaxInvoices = false;
                             });
                             _loadInvoices();
                           },
@@ -242,158 +269,31 @@ class _ContractsPageState extends State<ContractsPage> {
   }
 
   Widget _buildContractsList() {
-    if (_isLoading && _contracts.isEmpty) {
-      return Center(
-        child: CircularProgressIndicator(color: AppColors.lightGreen),
+    {
+      return ContractsListWidget(
+        isLoading: _isLoading,
+        error: _error,
+        contracts: _contracts,
+        scrollController: _scrollController,
+        hasReachedMax: _hasReachedMax,
+        onLoadMore: _loadContracts,
+        onRefresh: _onRefresh,
       );
     }
-    if (_error != null && _contracts.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              color: Colors.red.withAlpha(150),
-              size: 20.sp,
-            ),
-            SizedBox(height: 2.h),
-            Text(
-              '${"error".tr()}: $_error',
-              style: TextStyle(
-                color: Colors.red.withAlpha(150),
-                fontSize: 16.sp,
-                fontFamily: 'Ubuntu',
-              ),
-            ),
-            SizedBox(height: 2.h),
-            ElevatedButton(
-              onPressed: _loadContracts,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.darkGreen,
-                foregroundColor: AppColors.white,
-              ),
-              child: Text('retry'.tr()),
-            ),
-          ],
-        ),
-      );
-    }
-    if (_contracts.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.only(top: 2.h),
-          child: NoMadeWidget(
-            text: "no_contracts".tr(),
-            iconUrl: AppIcons.documentIcon,
-          ),
-        ),
-      );
-    }
-    return RefreshIndicator(
-      onRefresh: _onRefresh,
-      color: AppColors.darkGreen,
-      backgroundColor: AppColors.black,
-      child: ListView.builder(
-        controller: _scrollController,
-        itemCount: _contracts.length + (_hasReachedMax ? 0 : 1),
-        itemBuilder: (context, index) {
-          if (index == _contracts.length) {
-            if (_isLoading) {
-              return Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 2.h),
-                  child: Text(
-                    "Loading...",
-                    style: TextStyle(
-                    fontFamily: "Poppins",
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16.sp,
-                    color: AppColors.darkGreen
-                  ),
-                  ),
-                ),
-              );
-            }
-            return Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 2.h),
-                child: ElevatedButton(
-                  onPressed: _loadContracts,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.darkGreen,
-                  ),
-                  child: Text("Load more", style: TextStyle(
-                    fontFamily: "Poppins",
-                    color: AppColors.white,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15.sp,
-                  ),
-                  ),
-                ),
-              ),
-            );
-          }
-          final contract = _contracts[index];
-          return Material(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(6),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(6),
-              onTap: () {
-                context.go(
-                  '/contracts/contract_details',
-                  extra: {
-                    'contract': ContractModel.fromEntity(contract),
-                    'displayIndex': index + 1,
-                  },
-                );
-              },
-              child: ContractCard(
-                contract: ContractModel.fromEntity(contract),
-                displayIndex: index + 1,
-              ),
-            ),
-          );
-        },
-      ),
-    );
   }
 
   Widget _buildInvoicesList() {
-    if (_isInvoiceLoading) {
-      return Center(
-        child: CircularProgressIndicator(color: AppColors.lightGreen),
+    {
+      return InvoicesListWidget(
+        isLoading: _isInvoiceLoading,
+        error: _invoiceError,
+        invoices: _invoices,
+        scrollController: _invoiceScrollController,
+        hasReachedMax: _hasReachedMaxInvoices,
+        onLoadMore: _loadInvoices,
+        onRefresh: _onRefreshInvoices,
+        onInvoiceTap: (invoice) {},
       );
     }
-    if (_invoiceError != null) {
-      return Center(child: Text('Error: $_invoiceError'));
-    }
-    if (_invoices.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.only(top: 2.h),
-          child: NoMadeWidget(
-            text: "no_invoices".tr(),
-            iconUrl: AppIcons.documentIcon,
-          ),
-        ),
-      );
-    }
-    return RefreshIndicator(
-      onRefresh: _onRefresh,
-      color: AppColors.darkGreen,
-      backgroundColor: AppColors.black,
-      child: ListView.builder(
-        itemCount: _invoices.length,
-        itemBuilder: (context, index) {
-          final invoice = _invoices[index];
-          return InvoiceCard(
-            invoice: InvoiceModel.fromEntity(invoice),
-            displayIndex: index + 1,
-          );
-        },
-      ),
-    );
   }
 }

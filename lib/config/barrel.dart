@@ -10,4 +10,6 @@ export 'package:ibilling/features/contracts/presentation/pages/search_page.dart'
 export 'package:ibilling/features/create/presentation/pages/new_contract_page.dart';
 export 'package:ibilling/features/single/presentation/pages/contract_details_page.dart';
 export 'package:ibilling/features/create/presentation/pages/new_invoice_page.dart';
+export 'package:ibilling/features/ibilling/data/model/contract_model.dart';
+
 

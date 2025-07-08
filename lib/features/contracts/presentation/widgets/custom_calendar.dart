@@ -20,8 +20,8 @@ class CustomWeekCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final days = List.generate(6, (i) => focusedDay.add(Duration(days: i)));
-    final weekLabels = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+    final days = List.generate(6, (i) => _getStartOfWeek(focusedDay).add(Duration(days: i)));
+    final weekLabels = ["mon", "tue", "wed", "thu", "fri", "sat"];
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 2.w),
@@ -31,8 +31,8 @@ class CustomWeekCalendar extends StatelessWidget {
           ...List.generate(days.length, (index) {
             final day = days[index];
             final isSelected = day.year == selectedDay.year &&
-                               day.month == selectedDay.month &&
-                               day.day == selectedDay.day;
+                day.month == selectedDay.month &&
+                day.day == selectedDay.day;
             return Expanded(
               child: GestureDetector(
                 onTap: () => onDaySelected(day, focusedDay),
@@ -56,7 +56,7 @@ class CustomWeekCalendar extends StatelessWidget {
                           fontSize: 16,
                         ),
                         child: Text(
-                          weekLabels[(day.weekday - 1) % 7].tr(),
+                          weekLabels[index].tr(),
                         ),
                       ),
                       SizedBox(height: 1.h),
@@ -82,10 +82,17 @@ class CustomWeekCalendar extends StatelessWidget {
               ),
             );
           }),
-          // Right arrow
-
         ],
       ),
     );
+  }
+
+  DateTime _getStartOfWeek(DateTime date) {
+    final weekday = date.weekday;
+    if (weekday == 7) {
+      return date.add(Duration(days: 1));
+    } else {
+      return date.subtract(Duration(days: weekday - 1));
+    }
   }
 }

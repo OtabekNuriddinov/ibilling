@@ -1,8 +1,4 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ibilling/features/contracts/presentation/barrel.dart';
-import 'package:ibilling/features/contracts/presentation/widgets/no_made_widget.dart';
-import 'package:ibilling/features/ibilling/data/model/contract_model.dart';
-import 'package:ibilling/features/ibilling/presentation/bloc/contract_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -15,7 +11,6 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   DateTime? fromDate;
   DateTime? toDate;
-
 
   @override
   Widget build(BuildContext context) {
@@ -75,28 +70,25 @@ class _HistoryPageState extends State<HistoryPage> {
             Expanded(
               child: BlocBuilder<ContractBloc, ContractState>(
                 builder: (context, state) {
+                  if (state.isLoading) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (state.error != null) {
+                    return Center(child: Text('${"error".tr()}: ${state.error}'));
+                  }
                   if(fromDate==null || toDate == null){
                     return SizedBox.shrink();
                   }
                   final filteredContracts = state.contracts.where((contract) {
                     final contractDate = contract.date;
-
                     if (fromDate != null && contractDate.isBefore(fromDate!)) {
                       return false;
                     }
-
                     if (toDate != null && contractDate.isAfter(toDate!)) {
                       return false;
                     }
-
                     return true;
                   }).toList();
-                  if (state.status == ContractListStatus.loading) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                  if (state.status == ContractListStatus.failure) {
-                    return Center(child: Text('${"error".tr()}: ${state.error}'));
-                  }
                   if (filteredContracts.isEmpty) {
                     return Center(
                       child: NoMadeWidget(
@@ -104,7 +96,6 @@ class _HistoryPageState extends State<HistoryPage> {
                         iconUrl: AppIcons.documentIcon,
                       ),
                     );
-                    ;
                   }
                   return ListView.builder(
                     padding: EdgeInsets.only(top: 0),
@@ -118,12 +109,12 @@ class _HistoryPageState extends State<HistoryPage> {
                           onTap: (){
                             context.go("/history/history_contract_details", extra: {
                               "contract": contract,
-                              "displayIndex": index + 1,
+                              "displayIndex": int.tryParse(contract.id ?? '0') ?? 0,
                             });
                           },
                           child: ContractCard(
                             contract: ContractModel.fromEntity(contract),
-                            displayIndex: index + 1,
+                            displayIndex: int.tryParse(contract.id ?? '0') ?? 0,
                           ),
                         ),
                       );

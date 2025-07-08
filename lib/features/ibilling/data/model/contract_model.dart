@@ -21,8 +21,8 @@ class ContractModel extends ContractEntity {
       id: json['id'] == null
           ? null
           : (json['id'] is String
-              ? json['id'].toString()
-              : json['id'].toString()),
+                ? json['id'].toString()
+                : json['id'].toString()),
       personType: json['personType'] as String,
       fullName: json['fullName'] as String,
       address: json['address'] as String,

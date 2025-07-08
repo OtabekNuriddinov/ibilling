@@ -79,8 +79,8 @@ class _SavedPageState extends State<SavedPage> {
                       });
                     },
                     child: ContractCard(
-                      contract: contract,
-                      displayIndex: index + 1,
+                      contract: savedContracts[index],
+                      displayIndex: int.tryParse(savedContracts[index].id ?? '0') ?? 0,
                     ),
                   ),
                 );

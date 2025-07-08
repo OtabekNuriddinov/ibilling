@@ -216,41 +216,42 @@ class _ContractDetailsPageState extends State<ContractDetailsPage> {
                 SizedBox(height: 1.h),
                 BlocBuilder<ContractBloc, ContractState>(
                   builder: (context, state) {
+                    print('All contracts count: ${state.contracts.length}');
+                    print('Current contract fullName: ${widget.contract.fullName}');
                     final otherContracts = state.contracts
                         .where(
                           (c) =>
-                      c.fullName == widget.contract.fullName &&
-                          c.id != widget.contract.id,
-                    )
+                              c.fullName.trim().toLowerCase() == widget.contract.fullName.trim().toLowerCase() &&
+                              c.id != widget.contract.id,
+                        )
                         .toList();
+                    if (state.isLoading) {
+                      return Center(child: CircularProgressIndicator());
+                    }
                     if (otherContracts.isEmpty) {
-                      return Builder(
-                        builder: (context) {
-                          return Padding(
-                            padding: EdgeInsets.only(left: 26.w, top: 6.h),
-                            child: Text(
-                              "No other contracts",
-                              style: TextStyle(
-                                color: AppColors.white.withAlpha(100),
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16.sp,
-                              ),
-                            ),
-                          );
-                        }
+                      return Padding(
+                        padding: EdgeInsets.only(left: 26.w, top: 6.h),
+                        child: Text(
+                          "No other contracts",
+                          style: TextStyle(
+                            color: AppColors.white.withAlpha(100),
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16.sp,
+                          ),
+                        ),
                       );
                     }
-                    return ListView.builder(
+                    return ListView.separated(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: otherContracts.length,
+                      separatorBuilder: (_, __) => SizedBox(height: 1.h),
                       itemBuilder: (context, index) {
+                        final contract = otherContracts[index];
                         return ContractCard(
-                          contract: ContractModel.fromEntity(
-                            otherContracts[index],
-                          ),
-                          displayIndex: index + 1,
+                          contract: ContractModel.fromEntity(contract),
+                          displayIndex: int.tryParse(contract.id ?? '0') ?? 0,
                         );
                       },
                     );

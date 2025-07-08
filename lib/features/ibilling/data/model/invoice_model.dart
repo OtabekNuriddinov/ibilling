@@ -16,8 +16,8 @@ class InvoiceModel extends InvoiceEntity {
       id: json['id'] == null
           ? null
           : (json['id'] is String
-              ? json['id'].toString()
-              : json['id'].toString()),
+                ? json['id'].toString()
+                : json['id'].toString()),
       serviceName: json['serviceName'] as String,
       amount: json['amount'] as String,
       status: CommonMethods.statusFromFirestoreUniversal(
@@ -40,6 +40,7 @@ class InvoiceModel extends InvoiceEntity {
       'date': date.toIso8601String(),
     };
   }
+
   factory InvoiceModel.fromEntity(InvoiceEntity entity) {
     return InvoiceModel(
       id: entity.id,

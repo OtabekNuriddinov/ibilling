@@ -10,7 +10,7 @@ void main() async {
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => getIt<ContractBloc>()),
+        BlocProvider(create: (context) => getIt<ContractBloc>()..add(FetchContracts())),
         BlocProvider(create: (context) => getIt<InvoiceBloc>()),
       ],
       child: EasyLocalization(

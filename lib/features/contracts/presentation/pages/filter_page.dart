@@ -1,9 +1,4 @@
-import 'package:ibilling/features/contracts/presentation/widgets/no_made_widget.dart';
-import '../widgets/custom_check_box.dart';
-import '../../../../core/common/filter_methods.dart';
 import '../barrel.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ibilling/features/ibilling/presentation/bloc/contract_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class FilterPage extends StatefulWidget {
@@ -20,13 +15,12 @@ class _FilterPageState extends State<FilterPage> {
   bool rejectedByPayme = false;
   DateTime? fromDate;
   DateTime? toDate;
-  List<ContractModel> filteredContracts = [];
   bool isFilterApplied = false;
 
   @override
   void initState() {
     super.initState();
-    context.read<ContractBloc>().add(FetchContractsEvent());
+    context.read<ContractBloc>().add(FetchContracts());
   }
 
   @override
@@ -55,6 +49,22 @@ class _FilterPageState extends State<FilterPage> {
         ),
         body: BlocBuilder<ContractBloc, ContractState>(
           builder: (context, state) {
+            if (state.isLoading) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (state.error != null) {
+              return Center(child: Text('Error: ${state.error}'));
+            }
+            final allContracts = state.contracts;
+            final filteredContracts = FilterMethods.applyFilters(
+              allContracts: allContracts.map((e) => ContractModel.fromEntity(e)).toList(),
+              paid: paid,
+              rejectedByIQ: rejectedByIQ,
+              inProcess: inProcess,
+              rejectedByPayme: rejectedByPayme,
+              fromDate: fromDate,
+              toDate: toDate,
+            );
             return Padding(
               padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 2.h),
               child: Column(
@@ -216,35 +226,6 @@ class _FilterPageState extends State<FilterPage> {
                     ),
                   ),
                   SizedBox(height: 3.h),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 1.h),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: CustomButton(
-                            text: "cancel".tr(),
-                            textColor: AppColors.darkGreen,
-                            backColor: AppColors.darkGreen.withAlpha(80),
-                            onTap: () => _resetFilters(),
-                          ),
-                        ),
-                        SizedBox(width: 4.w),
-                        Expanded(
-                          child: CustomButton(
-                            text: "apply_filters".tr(),
-                            textColor: AppColors.white7,
-                            backColor: AppColors.darkGreen,
-                            onTap: () => _applyFilters(
-                              state.contracts
-                                  .map((e) => ContractModel.fromEntity(e))
-                                  .toList(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Filtered contracts section
                   if (isFilterApplied) ...[
                     SizedBox(height: 2.h),
                     Row(
@@ -288,6 +269,32 @@ class _FilterPageState extends State<FilterPage> {
                       ),
                     ),
                   ],
+                  SizedBox(height: 2.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomButton(
+                            text: "cancel".tr(),
+                            textColor: AppColors.darkGreen.withAlpha(90),
+                            backColor: AppColors.darkGreen.withAlpha(70),
+                            onTap: () => _resetFilters(),
+                        )
+                      ),
+                      SizedBox(width: 4.w),
+                      Expanded(
+                        child: CustomButton(
+                            text: "apply_filters".tr(),
+                            textColor: AppColors.white7,
+                            backColor: AppColors.darkGreen,
+                            onTap: (){
+                              setState(() {
+                                isFilterApplied = true;
+                              });
+                            }
+                        )
+                      ),
+                    ],
+                  ),
                 ],
               ),
             );
@@ -295,21 +302,6 @@ class _FilterPageState extends State<FilterPage> {
         ),
       ),
     );
-  }
-
-  void _applyFilters(List<ContractModel> allContracts) {
-    setState(() {
-      filteredContracts = FilterMethods.applyFilters(
-        allContracts: allContracts,
-        paid: paid,
-        rejectedByIQ: rejectedByIQ,
-        inProcess: inProcess,
-        rejectedByPayme: rejectedByPayme,
-        fromDate: fromDate,
-        toDate: toDate,
-      );
-      isFilterApplied = true;
-    });
   }
 
   void _resetFilters() {
@@ -320,7 +312,6 @@ class _FilterPageState extends State<FilterPage> {
       rejectedByPayme = false;
       fromDate = null;
       toDate = null;
-      filteredContracts = [];
       isFilterApplied = false;
     });
   }
@@ -330,17 +321,58 @@ class _FilterPageState extends State<FilterPage> {
   }
 
   void _selectDate(BuildContext context, bool isFrom) async {
-    await FilterMethods.selectDate(context, isFrom, fromDate, toDate, (
-      picked,
-      isFromDate,
-    ) {
+    DateTime initialDate = DateTime.now();
+    DateTime firstDate = DateTime(2000);
+    DateTime lastDate = DateTime(2100);
+
+    if (isFrom) {
+      if (toDate != null) {
+        lastDate = toDate!;
+      }
+      if (fromDate != null) {
+        initialDate = fromDate!;
+      }
+    } else {
+      if (fromDate != null) {
+        firstDate = fromDate!;
+        initialDate = fromDate!;
+      }
+      if (toDate != null) {
+        initialDate = toDate!;
+      }
+    }
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.dark(
+              primary: AppColors.darkGreen,
+              onPrimary: Colors.white,
+              surface: AppColors.darkest,
+              onSurface: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
       setState(() {
-        if (isFromDate) {
+        if (isFrom) {
           fromDate = picked;
+          if (toDate != null && picked.isAfter(toDate!)) {
+            toDate = null;
+          }
         } else {
           toDate = picked;
         }
       });
-    });
+    }
   }
 }

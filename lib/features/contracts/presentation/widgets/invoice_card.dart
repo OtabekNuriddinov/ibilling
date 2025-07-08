@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ibilling/features/contracts/presentation/widgets/invoice_card_row.dart';
 import 'package:ibilling/features/ibilling/data/model/invoice_model.dart';
 import '../barrel.dart';
@@ -54,17 +55,16 @@ class InvoiceCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          /// InvoiceCardRow qil
           SizedBox(height: 1.h),
           InvoiceCardRow(
             invoice: invoice,
-            startWord: 'Service',
+            startWord: 'service'.tr(),
             endWord: invoice.serviceName,
           ),
           SizedBox(height: 1.h),
           InvoiceCardRow(
             invoice: invoice,
-            startWord: 'Amount',
+            startWord: 'amount'.tr(),
             endWord: "${CommonMethods.formatAmount(invoice.amount)} UZS",
           ),
           SizedBox(height: 1.h),

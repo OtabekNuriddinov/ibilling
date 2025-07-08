@@ -12,3 +12,5 @@ export 'package:ibilling/features/create/presentation/components/custom_drop_dow
 export 'package:ibilling/features/create/presentation/components/custom_text_field.dart';
 export 'package:ibilling/features/ibilling/domain/entities/invoice_entity.dart';
 export 'package:ibilling/features/ibilling/presentation/bloc/invoice_bloc.dart';
+export  'package:ibilling/features/ibilling/domain/entities/contract_entity.dart';
+export  'package:ibilling/features/ibilling/presentation/bloc/contract_bloc.dart';

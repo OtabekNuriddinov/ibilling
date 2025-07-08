@@ -86,5 +86,6 @@
   "please_select_all_fields": "Please fill all fields",
   "filtered_results": "Filtered Results",
   "type_comment": "Type a comment",
-  "leave_comment_while": "Leave a comment, why are you deleting this contract?"
+  "leave_comment_while": "Leave a comment, why are you deleting this contract?",
+  "service": "Service"
 }

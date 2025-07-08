@@ -1,5 +1,3 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ibilling/features/ibilling/presentation/bloc/contract_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../barrel.dart';
 
@@ -99,7 +97,7 @@ class _SearchPageState extends State<SearchPage> {
               : ListView.builder(
                   itemCount: filteredContracts.length,
                   itemBuilder: (context, index) {
-                    final contract = contracts[index];
+                    final contract = filteredContracts[index];
                     return Material(
                       color: Colors.black,
                       borderRadius: BorderRadius.circular(6),
@@ -108,12 +106,12 @@ class _SearchPageState extends State<SearchPage> {
                         onTap: (){
                           context.go("/contracts/contract_details", extra: {
                             "contract": contract,
-                            "displayIndex": index + 1,
+                            "displayIndex": contract.id,
                           });
                         },
                         child: ContractCard(
-                          contract: filteredContracts[index],
-                          displayIndex: index + 1,
+                          contract: contract,
+                          displayIndex: int.tryParse(contract.id ?? '0') ?? 0,
                         ),
                       ),
                     );

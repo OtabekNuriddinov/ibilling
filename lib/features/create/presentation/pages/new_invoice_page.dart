@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-
 import '../barrel.dart';
 
 class NewInvoicePage extends StatefulWidget {

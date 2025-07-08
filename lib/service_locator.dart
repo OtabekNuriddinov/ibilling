@@ -4,18 +4,20 @@ import 'barrel.dart';
 final getIt = GetIt.instance;
 
 Future<void> setUpServiceLocator() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   getIt.registerLazySingleton<IBillingRemoteDataSource>(
     () => IBillingRemoteDataSource(),
   );
+
   getIt.registerLazySingleton<ContractRepository>(
     () => ContractRepositoryImpl(getIt<IBillingRemoteDataSource>()),
   );
+
   getIt.registerLazySingleton<InvoiceRepository>(
     () => InvoiceRepositoryImpl(getIt<IBillingRemoteDataSource>()),
   );
-
   getIt.registerLazySingleton<AddContract>(
     () => AddContract(getIt<ContractRepository>()),
   );

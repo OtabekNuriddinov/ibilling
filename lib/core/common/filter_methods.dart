@@ -52,7 +52,7 @@ class FilterMethods {
           onTap: () => onContractTap(contract, index),
           child: ContractCard(
             contract: contract,
-            displayIndex: index + 1,
+            displayIndex: int.tryParse(contract.id ?? '0') ?? 0,
           ),
         );
       },
@@ -104,7 +104,6 @@ class FilterMethods {
       },
     );
   }
-
   static Future<void> selectDate(
     BuildContext context,
     bool isFrom,

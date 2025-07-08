@@ -1,5 +1,3 @@
-import 'package:ibilling/features/ibilling/data/model/contract_model.dart';
-
 import 'barrel.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
