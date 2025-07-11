@@ -18,7 +18,7 @@ class NoMadeWidget extends StatelessWidget {
           SvgPicture.asset(
             iconUrl,
             colorFilter: ColorFilter.mode(
-              AppColors.white.withAlpha(100),
+              AppColors.white.withAlpha(45),
               BlendMode.srcIn,
             ),
           ),
@@ -26,7 +26,7 @@ class NoMadeWidget extends StatelessWidget {
           Text(
             text,
             style: TextStyle(
-              color: AppColors.white.withAlpha(100),
+              color: AppColors.white.withAlpha(55),
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w600,
               fontSize: 16.sp,

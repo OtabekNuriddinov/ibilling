@@ -7,7 +7,6 @@ import 'package:ibilling/features/ibilling/data/datasources/ibilling_local_datas
 import '../barrel.dart';
 
 
-
 class SavedPage extends StatefulWidget {
   const SavedPage({super.key});
 
@@ -41,7 +40,7 @@ class _SavedPageState extends State<SavedPage> {
         title: "saved".tr(),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 2.h),
+        padding: EdgeInsets.only(top: 8, left: 16, right: 16),
         child: FutureBuilder<List<ContractModel>>(
           future: _savedContractsFuture,
           builder: (context, snapshot) {
@@ -54,59 +53,31 @@ class _SavedPageState extends State<SavedPage> {
             final savedContracts = snapshot.data ?? [];
             if (savedContracts.isEmpty) {
               return Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 12.h),
-                  child: NoMadeWidget(
-                    text: "No saved contracts",
+                child: NoMadeWidget(
+                    text: "no_saved_contracts".tr(),
                     iconUrl: AppIcons.noMadeSaved,
                   ),
-                ),
               );
             }
             return ListView.builder(
-              padding: EdgeInsets.only(top: 0),
               itemCount: savedContracts.length,
               itemBuilder: (context, index) {
                 final contract = savedContracts[index];
-                return Material(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(6),
-                  child: InkWell(
-                    onTap: (){
-                      context.go("/saved/saved_contract_details",extra: {
-                      "contract": contract,
-                      "displayIndex": index + 1,
-                      });
-                    },
-                    child: ContractCard(
+                return  ContractCard(
                       contract: savedContracts[index],
                       displayIndex: int.tryParse(savedContracts[index].id ?? '0') ?? 0,
-                    ),
-                  ),
-                );
+                      onPressed: (){
+                        context.go("/saved/saved_contract_details",extra: {
+                          "contract": contract,
+                          "displayIndex": index + 1,
+                        });
+                      },
+                    );
               },
             );
           },
         ),
       ),
     );
-  }
-
-  void _selectDate(BuildContext context, bool isFrom) async {
-    final picked = await showCustomDatePicker(
-      context: context,
-      initialDate: isFrom
-          ? (fromDate ?? DateTime.now())
-          : (toDate ?? DateTime.now()),
-    );
-    if (picked != null) {
-      setState(() {
-        if (isFrom) {
-          fromDate = picked;
-        } else {
-          toDate = picked;
-        }
-      });
-    }
   }
 }

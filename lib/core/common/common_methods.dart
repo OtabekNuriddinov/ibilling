@@ -8,6 +8,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_icons.dart';
 import 'package:intl/intl.dart';
 
+/// For Understand deeply!!!
 sealed class CommonMethods {
   static AppBar customAppBar({
     required BuildContext context,
@@ -82,17 +83,39 @@ sealed class CommonMethods {
 
 
   static final contractStatusMap = <String, ContractStatus>{
+    // English
     "Paid": ContractStatus.paid,
     "In process": ContractStatus.inProcess,
     "Rejected by Payme": ContractStatus.rejectedByPayme,
     "Rejected by IQ": ContractStatus.rejectedByIQ,
+    // Russian
+    "Оплачено": ContractStatus.paid,
+    "В процессе": ContractStatus.inProcess,
+    "Отклонено Payme": ContractStatus.rejectedByPayme,
+    "Отклонено IQ": ContractStatus.rejectedByIQ,
+    // Uzbek
+    "To'langan": ContractStatus.paid,
+    "Jarayonda": ContractStatus.inProcess,
+    "Payme rad etdi": ContractStatus.rejectedByPayme,
+    "IQ rad etdi": ContractStatus.rejectedByIQ,
   };
   /// Invoice status label mapping
   static final invoiceStatusMap = <String, InvoiceStatus>{
+    // English
     "Paid": InvoiceStatus.paid,
     "In process": InvoiceStatus.inProcess,
     "Rejected by Payme": InvoiceStatus.rejectedByPayme,
     "Rejected by IQ": InvoiceStatus.rejectedByIQ,
+    // Russian
+    "Оплачено": InvoiceStatus.paid,
+    "В процессе": InvoiceStatus.inProcess,
+    "Отклонено Payme": InvoiceStatus.rejectedByPayme,
+    "Отклонено IQ": InvoiceStatus.rejectedByIQ,
+    // Uzbek
+    "To'langan": InvoiceStatus.paid,
+    "Jarayonda": InvoiceStatus.inProcess,
+    "Payme rad etdi": InvoiceStatus.rejectedByPayme,
+    "IQ rad etdi": InvoiceStatus.rejectedByIQ,
   };
   /// Contract status firestore mapping
   static final contractFirestoreMap = <String, ContractStatus>{
@@ -144,9 +167,10 @@ sealed class CommonMethods {
     }
   }
 
-  /// Converts a status label (e.g. 'Paid') to a translation key (e.g. 'paid') for contracts and invoices
+
   static String statusLabelToKey(String label) {
     switch (label) {
+      // English
       case 'Paid':
         return 'paid';
       case 'In process':
@@ -155,8 +179,60 @@ sealed class CommonMethods {
         return 'rejected_by_payme';
       case 'Rejected by IQ':
         return 'rejected_by_iq';
+      // Russian
+      case 'Оплачено':
+        return 'paid';
+      case 'В процессе':
+        return 'in_process';
+      case 'Отклонено Payme':
+        return 'rejected_by_payme';
+      case 'Отклонено IQ':
+        return 'rejected_by_iq';
+      // Uzbek
+      case 'To\'langan':
+        return 'paid';
+      case 'Jarayonda':
+        return 'in_process';
+      case 'Payme rad etdi':
+        return 'rejected_by_payme';
+      case 'IQ rad etdi':
+        return 'rejected_by_iq';
       default:
         return label;
+    }
+  }
+
+  static String statusLabelToEnglish(String label) {
+    switch (label) {
+      // English
+      case 'Paid':
+        return 'Paid';
+      case 'In process':
+        return 'In process';
+      case 'Rejected by Payme':
+        return 'Rejected by Payme';
+      case 'Rejected by IQ':
+        return 'Rejected by IQ';
+      // Russian
+      case 'Оплачено':
+        return 'Paid';
+      case 'В процессе':
+        return 'In process';
+      case 'Отклонено Payme':
+        return 'Rejected by Payme';
+      case 'Отклонено IQ':
+        return 'Rejected by IQ';
+      // Uzbek
+      case 'To\'langan':
+        return 'Paid';
+      case 'Jarayonda':
+        return 'In process';
+      case 'Payme rad etdi':
+        return 'Rejected by Payme';
+      case 'IQ rad etdi':
+        return 'Rejected by IQ';
+      default:
+        return 'In process';
     }
   }
 }

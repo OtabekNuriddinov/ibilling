@@ -4,7 +4,7 @@ class CustomButton extends StatelessWidget {
   final String text;
   final Color textColor;
   final Color backColor;
-  final Function() onTap;
+  final VoidCallback? onTap;
   const CustomButton({
     super.key,
     required this.text,
@@ -28,8 +28,8 @@ class CustomButton extends StatelessWidget {
           text, style: TextStyle(
             color: textColor,
             fontFamily: "Ubuntu",
-            fontWeight: FontWeight.w500,
-            fontSize: 15.5.sp
+            fontWeight: FontWeight.w700,
+            fontSize: 13
         ),)
     );
   }

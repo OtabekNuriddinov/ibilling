@@ -21,10 +21,10 @@ class CustomWeekCalendar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final days = List.generate(6, (i) => _getStartOfWeek(focusedDay).add(Duration(days: i)));
-    final weekLabels = ["mon", "tue", "wed", "thu", "fri", "sat"];
+    final weekLabels = ["Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 2.w),
+      padding: EdgeInsets.symmetric(horizontal: 11),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -63,17 +63,17 @@ class CustomWeekCalendar extends StatelessWidget {
                       AnimatedDefaultTextStyle(
                         duration: const Duration(milliseconds: 300),
                         style: AppTextStyles.tableCalendarDateStyle.copyWith(
-                          fontSize: 16.sp,
+                          fontSize: 14,
                           color: isSelected ? Colors.white : AppColors.white.withAlpha(100),
                         ),
                         child: Text('${day.day}'),
                       ),
-                      SizedBox(height: 0.5.h),
+                      SizedBox(height: 4),
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         margin: const EdgeInsets.only(top: 2),
                         height: 2,
-                        width: 24,
+                        width: 16,
                         color: isSelected ? Colors.white : AppColors.white.withAlpha(100),
                       ),
                     ],

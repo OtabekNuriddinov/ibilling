@@ -23,19 +23,19 @@ class ContractCardRow extends StatelessWidget {
         ),
         ),
         const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            endWord,
-            maxLines: 5,
-            overflow: TextOverflow.visible,
-            softWrap: true,
-            style: AppTextStyles.cardTextStyle.copyWith(
-              color: AppColors.white.withAlpha(100),
-              fontWeight: FontWeight.w400,
-              fontSize: 16.sp,
+       Expanded(
+         child: Text(
+              endWord,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: true,
+              style: AppTextStyles.cardTextStyle.copyWith(
+                color: AppColors.white.withAlpha(100),
+                fontWeight: FontWeight.w400,
+                fontSize: 16.sp,
+              ),
             ),
-          ),
-        ),
+       ),
       ],
     );
   }

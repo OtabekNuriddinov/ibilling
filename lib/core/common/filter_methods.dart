@@ -53,6 +53,7 @@ class FilterMethods {
           child: ContractCard(
             contract: contract,
             displayIndex: int.tryParse(contract.id ?? '0') ?? 0,
+            onPressed: ()=>navigateToContractDetails,
           ),
         );
       },
@@ -68,6 +69,9 @@ class FilterMethods {
     required DateTime? fromDate,
     required DateTime? toDate,
   }) {
+    DateTime? from = fromDate != null ? DateTime(fromDate.year, fromDate.month, fromDate.day) : null;
+    DateTime? to = toDate != null ? DateTime(toDate.year, toDate.month, toDate.day) : null;
+
     return allContracts.where((contract) {
       bool statusMatches = false;
       if (paid && contract.status == ContractStatus.paid) statusMatches = true;
@@ -80,12 +84,21 @@ class FilterMethods {
       }
 
       bool dateMatches = true;
-      if (fromDate != null && contract.date.isBefore(fromDate)) {
-        dateMatches = false;
+      final contractDate = DateTime(contract.date.year, contract.date.month, contract.date.day);
+
+      if (from != null && to == null) {
+        dateMatches = contractDate == from;
+      } else if (from == null && to != null) {
+        dateMatches = contractDate == to;
+      } else if (from != null && to != null) {
+        if (from == to) {
+          dateMatches = contractDate == from;
+        } else {
+          dateMatches = (contractDate.isAtSameMomentAs(from) || contractDate.isAfter(from)) &&
+                        (contractDate.isAtSameMomentAs(to) || contractDate.isBefore(to));
+        }
       }
-      if (toDate != null && contract.date.isAfter(toDate)) {
-        dateMatches = false;
-      }
+      // Aks holda (ikkalasi null) dateMatches true bo‘lib qoladi
 
       return statusMatches && dateMatches;
     }).toList();

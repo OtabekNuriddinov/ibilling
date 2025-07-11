@@ -18,22 +18,26 @@ class DateSelectable extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        width: 116,
+        height: 40,
         decoration: BoxDecoration(
           color: AppColors.dark,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(5),
         ),
-        child: Row(
-          children: [
-            Text(
-              date != null ? DateFormat('dd.MM.yyyy').format(date!) : label,
-              style: AppTextStyles.filterAboveTextStyle.copyWith(
-                fontSize: 16.sp,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: Row(
+            children: [
+              Text(
+                date != null ? DateFormat('dd.MM.yyyy').format(date!) : label,
+                style: AppTextStyles.filterAboveTextStyle.copyWith(
+                  fontSize: 14,
+                ),
               ),
-            ),
-            const Spacer(),
-            Icon(Icons.calendar_month, color: AppColors.white.withAlpha(100), size: 20),
-          ],
+              const SizedBox(width: 4),
+              Icon(Icons.calendar_month, color: AppColors.white.withAlpha(100), size: 16),
+            ],
+          ),
         ),
       ),
     );

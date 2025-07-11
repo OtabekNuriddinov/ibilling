@@ -154,12 +154,22 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                         Spacer(),
-                        SvgPicture.asset(
-                          currentLangIndex == 0
-                              ? 'assets/flags/uzbek.svg'
-                              : currentLangIndex == 1
-                              ? 'assets/flags/russia.svg'
-                              : 'assets/flags/usa.svg',
+                        SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: SvgPicture.asset(
+                              currentLangIndex == 0
+                                  ? 'assets/flags/uzbek.svg'
+                                  : currentLangIndex == 1
+                                  ? 'assets/flags/russia.svg'
+                                  : 'assets/flags/usa.svg',
+                              width: 32,
+                              height: 32,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
                         ),
                       ],
                     ),

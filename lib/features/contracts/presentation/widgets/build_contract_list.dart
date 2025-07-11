@@ -1,14 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:ibilling/features/contracts/presentation/widgets/no_made_widget.dart';
 import '../barrel.dart';
 
 class ContractsListWidget extends StatelessWidget {
   final bool isLoading;
   final String? error;
   final List<dynamic> contracts;
-  final ScrollController scrollController;
   final bool hasReachedMax;
-  final VoidCallback onLoadMore;
+  final VoidCallback? onLoadMore;
   final Future<void> Function() onRefresh;
 
   const ContractsListWidget({
@@ -16,9 +14,8 @@ class ContractsListWidget extends StatelessWidget {
     required this.isLoading,
     this.error,
     required this.contracts,
-    required this.scrollController,
     required this.hasReachedMax,
-    required this.onLoadMore,
+    this.onLoadMore,
     required this.onRefresh,
   });
 
@@ -35,10 +32,10 @@ class ContractsListWidget extends StatelessWidget {
     if (contracts.isEmpty) {
       return _buildEmptyWidget();
     }
-
     return _buildListView();
   }
 
+  /// Shularni Components Qilish kerak
   Widget _buildErrorWidget() {
     return Center(
       child: Column(
@@ -75,7 +72,7 @@ class ContractsListWidget extends StatelessWidget {
   Widget _buildEmptyWidget() {
     return Center(
       child: Padding(
-        padding: EdgeInsets.only(top: 2.h),
+        padding: EdgeInsets.only(top: 140),
         child: NoMadeWidget(
           text: "no_contracts".tr(),
           iconUrl: AppIcons.documentIcon,
@@ -85,45 +82,37 @@ class ContractsListWidget extends StatelessWidget {
   }
 
   Widget _buildListView() {
-    return RefreshIndicator(
-      onRefresh: onRefresh,
-      color: AppColors.darkGreen,
-      backgroundColor: AppColors.black,
-      child: ListView.builder(
-        controller: scrollController,
-        itemCount: contracts.length + (hasReachedMax ? 0 : 1),
-        itemBuilder: (context, index) {
-          if (index == contracts.length) {
-            return _buildLoadMoreWidget();
-          }
-
-          final contract = contracts[index];
-          return Material(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(6),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(6),
-              onTap: () {
-                context.go(
-                  '/contracts/contract_details',
-                  extra: {
-                    'contract': ContractModel.fromEntity(contract),
-                    'displayIndex': int.tryParse(contract.id ?? '0') ?? 0,
-                  },
-                );
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: contracts.length + (hasReachedMax || onLoadMore == null ? 0 : 1),
+      itemBuilder: (context, index) {
+        if (index == contracts.length) {
+          return _buildLoadMoreWidget();
+        }
+        final contract = contracts[index];
+        return ContractCard(
+          contract: ContractModel.fromEntity(contract),
+          displayIndex: int.tryParse(contract.id ?? '0') ?? 0,
+          onPressed: () {
+            context.go(
+              '/contracts/contract_details',
+              extra: {
+                'contract': ContractModel.fromEntity(contract),
+                'displayIndex': int.tryParse(contract.id ?? '0') ?? 0,
               },
-              child: ContractCard(
-                contract: ContractModel.fromEntity(contract),
-                displayIndex: int.tryParse(contract.id ?? '0') ?? 0,
-              ),
-            ),
-          );
-        },
-      ),
+            );
+          }
+        );
+      },
     );
   }
 
   Widget _buildLoadMoreWidget() {
+    if (onLoadMore == null) {
+      return SizedBox.shrink();
+    }
+    
     if (isLoading) {
       return Center(
         child: Padding(

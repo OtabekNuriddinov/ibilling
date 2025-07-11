@@ -4,6 +4,7 @@ import 'package:ibilling/features/ibilling/presentation/widgets/language_option.
 import '../../features/ibilling/presentation/widgets/dialog_button_choose.dart';
 
 sealed class AppDialogs {
+
   static Future<void> showCreateDialog(BuildContext context) async {
     await showDialog(
       context: context,
@@ -43,30 +44,16 @@ sealed class AppDialogs {
                     context.go("/new_invoice");
                   },
                 ),
+                const SizedBox(height: 4),
               ],
             ),
-          ),
-        );
+        ));
       },
     );
   }
 
   static Future<int?> languageDialog(BuildContext context, int selectedLang) async {
-    int getCurrentLanguageIndex() {
-      final currentLocale = context.locale;
-      switch (currentLocale.languageCode) {
-        case 'uz':
-          return 0;
-        case 'ru':
-          return 1;
-        case 'en':
-          return 2;
-        default:
-          return selectedLang;
-      }
-    }
-
-    int selectedLangInDialog = getCurrentLanguageIndex();
+    int selectedLangInDialog = selectedLang;
 
     return await showDialog<int>(
       context: context,
@@ -80,157 +67,101 @@ sealed class AppDialogs {
             height: 36.h,
             width: 80.w,
             child: Padding(
-              padding: EdgeInsets.only(
-                top: 2.h,
-                bottom: 1.h,
-                left: 3.w,
-                right: 3.w,
-              ),
+              padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 3.w),
               child: StatefulBuilder(
                 builder: (context, setStateDialog) {
-                  return Padding(
-                    padding: EdgeInsets.only(right: 4.w),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Choose a language".tr(),
-                          style: AppTextStyles.numberTextStyle,
-                        ),
-                        SizedBox(height: 1.h),
-                        InkWell(
-                          borderRadius: BorderRadius.circular(6),
-                          onTap: () async {
-                            setStateDialog(() {
-                              selectedLangInDialog = 0;
-                            });
-                          },
-                          child: Row(
-                            children: [
-                              SvgPicture.asset(AppIcons.uzbFlag),
-                              Text(
-                                "O'zbek (Latin)".tr(),
-                                style: AppTextStyles.languageTextStyle,
-                              ),
-                              Spacer(),
-                              LanguageOption(
-                                selectedLangInDialog: selectedLangInDialog,
-                                currentIndex: 0,
-                              ),
-                            ],
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "choose_language".tr(),
+                        style: AppTextStyles.numberTextStyle,
+                      ),
+                      SizedBox(height: 2.h),
+
+                      _buildLanguageOption(
+                        context: context,
+                        selectedLangInDialog: selectedLangInDialog,
+                        index: 0,
+                        icon: AppIcons.uzbFlag,
+                        label: "O'zbek (Latin)".tr(),
+                        onSelected: () => setStateDialog(() {
+                          selectedLangInDialog = 0;
+                        }),
+                      ),
+
+                      SizedBox(height: 1.2.h),
+
+                      _buildLanguageOption(
+                        context: context,
+                        selectedLangInDialog: selectedLangInDialog,
+                        index: 1,
+                        icon: AppIcons.rusFlag,
+                        label: "Русский".tr(),
+                        onSelected: () => setStateDialog(() {
+                          selectedLangInDialog = 1;
+                        }),
+                      ),
+
+                      SizedBox(height: 1.2.h),
+
+                      _buildLanguageOption(
+                        context: context,
+                        selectedLangInDialog: selectedLangInDialog,
+                        index: 2,
+                        icon: AppIcons.usaFlag,
+                        label: "English (USA)".tr(),
+                        onSelected: () => setStateDialog(() {
+                          selectedLangInDialog = 2;
+                        }),
+                      ),
+
+                      SizedBox(height: 2.5.h),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: 4.5.h,
+                            width: 30.w,
+                            child: CustomButton(
+                              text: "cancel".tr(),
+                              textColor: AppColors.darkGreen,
+                              backColor: AppColors.darkGreen.withAlpha(70),
+                              onTap: () => Navigator.of(context).pop(),
+                            ),
                           ),
-                        ),
+                          SizedBox(width: 20),
+                          SizedBox(
+                            height: 4.5.h,
+                            width: 30.w,
+                            child: CustomButton(
+                              text: "done".tr(),
+                              textColor: AppColors.white7,
+                              backColor: AppColors.darkGreen,
+                              onTap: () async {
+                                Locale newLocale;
+                                switch (selectedLangInDialog) {
+                                  case 0:
+                                    newLocale = const Locale('uz');
+                                    break;
+                                  case 1:
+                                    newLocale = const Locale('ru');
+                                    break;
+                                  case 2:
+                                  default:
+                                    newLocale = const Locale('en');
+                                }
 
-                        // Russian
-                        InkWell(
-                          borderRadius: BorderRadius.circular(6),
-                          onTap: () async {
-                            setStateDialog(() {
-                              selectedLangInDialog = 1;
-                            });
-                          },
-                          child: Row(
-                            children: [
-                              SvgPicture.asset(AppIcons.rusFlag),
-                              Text(
-                                "Русский".tr(),
-                                style: AppTextStyles.languageTextStyle,
-                              ),
-                              Spacer(),
-                              LanguageOption(
-                                selectedLangInDialog: selectedLangInDialog,
-                                currentIndex: 1,
-                              ),
-                            ],
+                                await context.setLocale(newLocale);
+                                await IBillingLocalDataSource.saveSelectedLangIndex(selectedLangInDialog);
+                                Navigator.of(context).pop(selectedLangInDialog);
+                              },
+                            ),
                           ),
-                        ),
-
-                        // English
-                        InkWell(
-                          borderRadius: BorderRadius.circular(6),
-                          onTap: () async {
-                            setStateDialog(() {
-                              selectedLangInDialog = 2;
-                            });
-                          },
-                          child: Row(
-                            children: [
-                              SvgPicture.asset(AppIcons.usaFlag),
-                              Text(
-                                "English (USA)".tr(),
-                                style: AppTextStyles.languageTextStyle,
-                              ),
-                              Spacer(),
-                              LanguageOption(
-                                selectedLangInDialog: selectedLangInDialog,
-                                currentIndex: 2,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        SizedBox(height: 1.5.h),
-                        Padding(
-                          padding: EdgeInsets.only(left: 4.w),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              SizedBox(
-                                height: 4.5.h,
-                                width: 30.w,
-                                child: CustomButton(
-                                  text: "Cancel".tr(),
-                                  textColor: AppColors.darkGreen,
-                                  backColor: AppColors.darkGreen.withAlpha(70),
-                                  onTap: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ),
-                              SizedBox(width: 4.w),
-                              SizedBox(
-                                height: 4.5.h,
-                                width: 30.w,
-                                child: CustomButton(
-                                  text: "Done".tr(),
-                                  textColor: AppColors.white7,
-                                  backColor: AppColors.darkGreen,
-                                  onTap: () async {
-                                    // Faqat til haqiqatan o'zgargan bo'lsa, locale ni o'zgartirish
-                                    final currentIndex = getCurrentLanguageIndex();
-                                    if (selectedLangInDialog != currentIndex) {
-                                      Locale newLocale;
-                                      switch (selectedLangInDialog) {
-                                        case 0:
-                                          newLocale = const Locale('uz');
-                                          break;
-                                        case 1:
-                                          newLocale = const Locale('ru');
-                                          break;
-                                        case 2:
-                                          newLocale = const Locale('en');
-                                          break;
-                                        default:
-                                          newLocale = const Locale('en');
-                                      }
-
-                                      // Locale ni o'zgartirish
-                                      await context.setLocale(newLocale);
-
-                                      // Local storage ga saqlash
-                                      await IBillingLocalDataSource.saveSelectedLangIndex(selectedLangInDialog);
-                                    }
-
-                                    Navigator.of(context).pop(selectedLangInDialog);
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
                   );
                 },
               ),
@@ -240,6 +171,47 @@ sealed class AppDialogs {
       },
     );
   }
+
+
+  /// Reusable method for language option
+  static Widget _buildLanguageOption({
+    required BuildContext context,
+    required int selectedLangInDialog,
+    required int index,
+    required String icon,
+    required String label,
+    required VoidCallback onSelected,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: onSelected,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 13),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                SvgPicture.asset(
+                  icon,
+                  width: 36,
+                  height: 24,
+                ),
+                SizedBox(width: 12),
+                Text(label, style: AppTextStyles.languageTextStyle),
+              ],
+            ),
+            LanguageOption(
+              selectedLangInDialog: selectedLangInDialog,
+              currentIndex: index,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
 
   static Future<String?> showDeleteCommentDialog(BuildContext context) async {
     final controller = TextEditingController();
@@ -263,7 +235,7 @@ sealed class AppDialogs {
                     style: AppTextStyles.cardTextStyle.copyWith(
                       color: AppColors.white,
                       fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -321,5 +293,6 @@ sealed class AppDialogs {
     );
   }
 }
+
 
 

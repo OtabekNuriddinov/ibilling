@@ -1,5 +1,3 @@
-import 'package:ibilling/core/theme/app_text_styles.dart';
-
 import '../barrel.dart';
 
 class DialogButton extends StatelessWidget {
@@ -16,22 +14,20 @@ class DialogButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Color(0xFF2A2A2D),
-      borderRadius: BorderRadius.circular(8),
+      color: Color(0xFF4E4E4E),
+      borderRadius: BorderRadius.circular(4),
       child: InkWell(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(4),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
               SvgPicture.asset(iconPath, width: 24, height: 24),
               const SizedBox(width: 12),
               Text(
                 label,
-                style: AppTextStyles.cardTextStyle.copyWith(
-
-                )
+                style: AppTextStyles.cardTextStyle,
               ),
             ],
           ),

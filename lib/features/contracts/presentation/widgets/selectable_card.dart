@@ -24,8 +24,8 @@ class SelectableCard extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        width: 27.w,
-        height: 5.h,
+        width: 110,
+        height: 40,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(6),
           color: selectedIndex == currentIndex
@@ -37,6 +37,7 @@ class SelectableCard extends StatelessWidget {
             text,
             style: AppTextStyles.cardTextStyle.copyWith(
               color: AppColors.white,
+              fontSize: 15,
             ),
           ),
         ),

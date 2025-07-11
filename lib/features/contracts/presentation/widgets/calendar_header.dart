@@ -21,7 +21,7 @@ class CalendarHeader extends StatelessWidget {
     final year = focusedDay.year;
     final header = '$month, $year';
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

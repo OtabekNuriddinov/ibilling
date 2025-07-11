@@ -40,24 +40,24 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
   }
 
   Future<void> _onAddContract(AddContractEvent event, Emitter<ContractState> emit) async {
-    emit(state.copyWith(isLoading: true, error: null, status: ContractListStatus.loading));
+    emit(state.copyWith(isLoading: true, error: null, status: ContractListStatus.loading, lastAction: ContractAction.none));
     try {
       await addContract(event.contract);
       final contracts = await getContracts();
-      emit(state.copyWith(contracts: contracts, isLoading: false, status: ContractListStatus.success));
+      emit(state.copyWith(contracts: contracts, isLoading: false, status: ContractListStatus.success, lastAction: ContractAction.add));
     } catch (e) {
-      emit(state.copyWith(isLoading: false, error: e.toString(), status: ContractListStatus.failure));
+      emit(state.copyWith(isLoading: false, error: e.toString(), status: ContractListStatus.failure, lastAction: ContractAction.none));
     }
   }
 
   Future<void> _onDeleteContract(DeleteContractEvent event, Emitter<ContractState> emit) async {
-    emit(state.copyWith(isLoading: true, error: null, status: ContractListStatus.loading));
+    emit(state.copyWith(isLoading: true, error: null, status: ContractListStatus.loading, lastAction: ContractAction.none));
     try {
       await deleteContract(event.id);
       final contracts = await getContracts();
-      emit(state.copyWith(contracts: contracts, isLoading: false, status: ContractListStatus.success));
+      emit(state.copyWith(contracts: contracts, isLoading: false, status: ContractListStatus.success, lastAction: ContractAction.delete));
     } catch (e) {
-      emit(state.copyWith(isLoading: false, error: e.toString(), status: ContractListStatus.failure));
+      emit(state.copyWith(isLoading: false, error: e.toString(), status: ContractListStatus.failure, lastAction: ContractAction.none));
     }
   }
 }

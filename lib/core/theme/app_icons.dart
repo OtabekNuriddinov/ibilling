@@ -1,7 +1,6 @@
 
 sealed class AppIcons{
 
-
   static String appBarIcon = "assets/icons/appbar_icon.svg";
   static String filterIcon = "assets/icons/filter_icon.svg";
   static String searchIcon = "assets/icons/search_icon.svg";

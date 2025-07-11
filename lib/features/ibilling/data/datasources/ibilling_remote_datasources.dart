@@ -13,11 +13,10 @@ class IBillingRemoteDataSource implements ContractRepository {
   Future<void> addContract(ContractEntity contract) async {
     final contractModel = ContractModel.fromEntity(contract);
     final contractMap = contractModel.toJson();
-    final querySnapshot = await firestore.collection('contracts').get();
+    final newId = DateTime.now().millisecondsSinceEpoch.toString();
+    contractMap['id'] = newId;
     try {
-      final nextId = (querySnapshot.docs.length + 1).toString();
       final docRef = await FirebaseFirestore.instance.collection('contracts').add(contractMap);
-      await docRef.update({'id': nextId});
     } catch (e) {
       debugPrint("Something went wrong: $e");
     }
@@ -41,7 +40,7 @@ class IBillingRemoteDataSource implements ContractRepository {
         .whereType<ContractModel>()
         .toList();
     
-    contracts.sort((a, b) => (int.tryParse(a.id ?? '0') ?? 0).compareTo(int.tryParse(b.id ?? '0') ?? 0));
+    contracts.sort((a, b) => (int.tryParse(b.id ?? '0') ?? 0).compareTo(int.tryParse(a.id ?? '0') ?? 0));
 
     debugPrint('Returning \\${contracts.length} contracts');
     return contracts;
@@ -69,11 +68,10 @@ class IBillingRemoteDataSource implements ContractRepository {
   Future<void> addInvoice(InvoiceEntity invoice) async {
     final invoiceModel = InvoiceModel.fromEntity(invoice);
     final invoiceMap = invoiceModel.toJson();
-    final querySnapshot = await firestore.collection('invoices').get();
+    final newId = DateTime.now().millisecondsSinceEpoch.toString();
+    invoiceMap['id'] = newId;
     try{
-      final nextId = querySnapshot.docs.length + 1;
       final docRef = await firestore.collection('invoices').add(invoiceMap);
-      await docRef.update({'id': nextId});
     }catch(e){
       debugPrint("Something went wrong: $e");
     }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:ibilling/features/contracts/presentation/barrel.dart';
 
 class CustomDropDownField extends StatefulWidget {
@@ -5,6 +6,8 @@ class CustomDropDownField extends StatefulWidget {
   final List<String> items;
   final ValueChanged<String?> onChanged;
   final String? hint;
+  final String? label;
+  final String? errorText;
 
   const CustomDropDownField({
     super.key,
@@ -12,6 +15,8 @@ class CustomDropDownField extends StatefulWidget {
     required this.items,
     required this.onChanged,
     this.hint,
+    this.label,
+    this.errorText,
   });
 
   @override
@@ -40,8 +45,22 @@ class _CustomDropDownFieldState extends State<CustomDropDownField> {
       _removeOverlay();
       return;
     }
+    final renderBox = context.findRenderObject() as RenderBox;
+    final size = renderBox.size;
+    final offset = renderBox.localToGlobal(Offset.zero);
+    final screenHeight = MediaQuery.of(context).size.height;
+    final dropdownHeight = 220.0;
 
-    _overlayEntry = _createOverlayEntry();
+    final spaceBelow = screenHeight - offset.dy - size.height;
+    final spaceAbove = offset.dy;
+
+    bool openUpwards = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+
+    _overlayEntry = _createOverlayEntry(
+      openUpwards: openUpwards,
+      buttonOffset: offset,
+      buttonSize: size,
+    );
     Overlay.of(context).insert(_overlayEntry!);
     setState(() {
       _isOpen = true;
@@ -50,7 +69,7 @@ class _CustomDropDownFieldState extends State<CustomDropDownField> {
 
   @override
   Widget build(BuildContext context) {
-    return CompositedTransformTarget(
+    final dropdown = CompositedTransformTarget(
       link: _layerLink,
       child: GestureDetector(
         onTap: _showDropdown,
@@ -62,7 +81,7 @@ class _CustomDropDownFieldState extends State<CustomDropDownField> {
             border: Border.all(
               color: AppColors.white1,
               width: 0.5,
-            ),
+            )
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -81,8 +100,8 @@ class _CustomDropDownFieldState extends State<CustomDropDownField> {
                   ),
                 ),
                 Container(
-                  width: 24,
-                  height: 24,
+                  width: 20,
+                  height: 20,
                   decoration: BoxDecoration(
                     color: const Color(0xFF404040),
                     shape: BoxShape.circle,
@@ -91,7 +110,7 @@ class _CustomDropDownFieldState extends State<CustomDropDownField> {
                     _isOpen
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
-                    color: AppColors.white1,
+                    color: AppColors.black,
                     size: 16,
                   ),
                 ),
@@ -101,25 +120,54 @@ class _CustomDropDownFieldState extends State<CustomDropDownField> {
         ),
       ),
     );
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.label != null) ...[
+            Text(
+              widget.label!,
+              style: AppTextStyles.textFieldTextStyle.copyWith(
+                color: AppColors.white1,
+                fontWeight: FontWeight.w500,
+                fontSize: 15,
+              ),
+            ),
+            SizedBox(height: 8),
+          ],
+          dropdown,
+          if (widget.errorText != null) ...[
+            SizedBox(height: 6),
+            Text(
+              widget.errorText!,
+              style: TextStyle(color: Colors.red, fontSize: 13),
+            ),
+          ],
+        ],
+      ),
+    );
   }
 
-  OverlayEntry _createOverlayEntry() {
-    RenderBox renderBox = context.findRenderObject() as RenderBox;
-    Size size = renderBox.size;
+  OverlayEntry _createOverlayEntry({required bool openUpwards, required Offset buttonOffset, required Size buttonSize}) {
     return OverlayEntry(
       builder: (context) => Positioned(
-        width: size.width,
+        width: buttonSize.width,
+        left: buttonOffset.dx,
+        top: openUpwards
+            ? buttonOffset.dy - 220 - 4
+            : buttonOffset.dy + buttonSize.height + 4,
         child: CompositedTransformFollower(
           link: _layerLink,
           showWhenUnlinked: false,
-          offset: Offset(0.0, size.height),
+          offset: Offset(0, 0),
           child: Material(
-            elevation: 8,
-            borderRadius: BorderRadius.circular(4),
+            elevation: 12,
+            borderRadius: BorderRadius.circular(8),
             color: AppColors.dark,
-            child: Container(
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 180),
               constraints: BoxConstraints(
-                maxHeight: 200,
+                maxHeight: 220,
               ),
               child: ListView.builder(
                 padding: EdgeInsets.zero,
@@ -129,6 +177,7 @@ class _CustomDropDownFieldState extends State<CustomDropDownField> {
                   final item = widget.items[index];
                   final isSelected = widget.value == item;
                   return InkWell(
+                    borderRadius: BorderRadius.circular(8),
                     onTap: () {
                       widget.onChanged(item);
                       _removeOverlay();
@@ -137,15 +186,19 @@ class _CustomDropDownFieldState extends State<CustomDropDownField> {
                     child: Container(
                       height: 48,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: isSelected ? AppColors.darkGreen.withOpacity(0.08) : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                       child: Row(
                         children: [
                           Expanded(
                             child: Text(
                               item,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: isSelected ? AppColors.darkGreen : Colors.white,
                                 fontSize: 16,
-                                fontWeight: FontWeight.w400,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
@@ -164,15 +217,15 @@ class _CustomDropDownFieldState extends State<CustomDropDownField> {
                             ),
                             child: isSelected
                                 ? Center(
-                              child: Container(
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: AppColors.darkGreen,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            )
+                                    child: Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.darkGreen,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  )
                                 : null,
                           ),
                         ],

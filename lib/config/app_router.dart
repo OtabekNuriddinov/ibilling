@@ -1,3 +1,5 @@
+import 'package:ibilling/features/contracts/presentation/barrel.dart';
+
 import 'barrel.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -24,9 +26,17 @@ final GoRouter router = GoRouter(
       routes: [
         GoRoute(
           path: '/contracts',
-          pageBuilder: (context, state) => NoTransitionPage(
-            child: const ContractsPage(key: ValueKey("contracts_page")),
-          ),
+          pageBuilder: (context, state) {
+            final extraContracts = state.extra is List<ContractEntity>
+                ? state.extra as List<ContractEntity>
+                : null;
+            return NoTransitionPage(
+              child: ContractsPage(
+                key: const ValueKey("contracts_page"),
+                filteredContracts: extraContracts,
+              ),
+            );
+          },
           routes: <RouteBase>[
             GoRoute(
               path: 'search',
@@ -69,8 +79,7 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/history',
           pageBuilder: (context, state) => NoTransitionPage(
-            child: const HistoryPage(key: ValueKey("history_page"),
-            ),
+            child: const HistoryPage(key: ValueKey("history_page")),
           ),
           routes: [
             GoRoute(
@@ -94,7 +103,7 @@ final GoRouter router = GoRouter(
                 );
               },
             ),
-          ]
+          ],
         ),
         GoRoute(
           path: '/saved',
@@ -123,7 +132,7 @@ final GoRouter router = GoRouter(
                 );
               },
             ),
-          ]
+          ],
         ),
         GoRoute(
           path: '/profile',

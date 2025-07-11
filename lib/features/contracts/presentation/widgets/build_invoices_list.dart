@@ -11,7 +11,6 @@ class InvoicesListWidget extends StatelessWidget {
   final bool isLoading;
   final String? error;
   final List<dynamic> invoices;
-  final ScrollController scrollController;
   final bool hasReachedMax;
   final VoidCallback onLoadMore;
   final Future<void> Function() onRefresh;
@@ -22,7 +21,6 @@ class InvoicesListWidget extends StatelessWidget {
     required this.isLoading,
     this.error,
     required this.invoices,
-    required this.scrollController,
     required this.hasReachedMax,
     required this.onLoadMore,
     required this.onRefresh,
@@ -82,7 +80,7 @@ class InvoicesListWidget extends StatelessWidget {
   Widget _buildEmptyWidget() {
     return Center(
       child: Padding(
-        padding: EdgeInsets.only(top: 2.h),
+        padding: EdgeInsets.only(top: 140),
         child: NoMadeWidget(
           text: "no_invoices".tr(),
           iconUrl: AppIcons.documentIcon,
@@ -92,34 +90,23 @@ class InvoicesListWidget extends StatelessWidget {
   }
 
   Widget _buildListView() {
-    return RefreshIndicator(
-      onRefresh: onRefresh,
-      color: AppColors.darkGreen,
-      backgroundColor: AppColors.black,
-      child: ListView.builder(
-        controller: scrollController,
+    return  ListView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
         itemCount: invoices.length + (hasReachedMax ? 0 : 1),
         itemBuilder: (context, index) {
           if (index == invoices.length) {
             return _buildLoadMoreWidget();
           }
-
           final invoice = invoices[index];
-          return Material(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(6),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(6),
-              onTap: () => onInvoiceTap?.call(invoice),
-              child: InvoiceCard(
+          return InvoiceCard(
+            onPressed: (){},
                 invoice: InvoiceModel.fromEntity(invoice),
                 displayIndex: int.tryParse(invoice.id ?? '0') ?? 0,
-              ),
-            ),
-          );
+              );
         },
-      ),
-    );
+      );
+
   }
 
   Widget _buildLoadMoreWidget() {

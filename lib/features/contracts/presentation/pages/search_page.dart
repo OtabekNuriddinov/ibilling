@@ -27,9 +27,11 @@ class _SearchPageState extends State<SearchPage> {
             ? []
             : contracts
                   .where(
-                    (contract) => contract.fullName.toLowerCase().startsWith(
-                      query.toLowerCase(),
-                    ),
+                    (contract) =>
+                        (contract.fullName.toLowerCase().startsWith(
+                          query.toLowerCase(),
+                        ) ||
+                        contract.inn.toString().startsWith(query)),
                   )
                   .toList();
         return Scaffold(
@@ -76,44 +78,27 @@ class _SearchPageState extends State<SearchPage> {
           ),
           body: filteredContracts.isEmpty
               ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        AppIcons.documentIcon,
-                        colorFilter: ColorFilter.mode(
-                          AppColors.white.withAlpha(100),
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                      SizedBox(height: 2.h),
-                      Text(
-                        "no_contracts".tr(),
-                        style: AppTextStyles.noAreMadeTextStyle,
-                      ),
-                    ],
+                  child: NoMadeWidget(
+                    text: "no_contracts".tr(),
+                    iconUrl: AppIcons.documentIcon,
                   ),
                 )
               : ListView.builder(
                   itemCount: filteredContracts.length,
                   itemBuilder: (context, index) {
                     final contract = filteredContracts[index];
-                    return Material(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(6),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(6),
-                        onTap: (){
-                          context.go("/contracts/contract_details", extra: {
+                    return ContractCard(
+                      onPressed: () {
+                        context.go(
+                          "/contracts/contract_details",
+                          extra: {
                             "contract": contract,
-                            "displayIndex": contract.id,
-                          });
-                        },
-                        child: ContractCard(
-                          contract: contract,
-                          displayIndex: int.tryParse(contract.id ?? '0') ?? 0,
-                        ),
-                      ),
+                            "displayIndex": int.tryParse(contract.id ?? "0"),
+                          },
+                        );
+                      },
+                      contract: contract,
+                      displayIndex: int.tryParse(contract.id ?? '0') ?? 0,
                     );
                   },
                 ),

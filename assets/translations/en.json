@@ -1,6 +1,7 @@
 {
   "contracts": "Contracts",
   "contract": "Contract",
+  "found": "found",
   "history": "History",
   "new": "New",
   "saved": "Saved",
@@ -23,7 +24,7 @@
   "rejected_by_iq": "Rejected by IQ",
   "amount": "Amount",
   "last_invoice": "Last invoice",
-  "number_of_invoices": "Number of invoices:",
+  "number_of_invoices": "Number of invoice",
   "fish": "Fish",
   "no_contracts": "No contracts are made",
   "no_invoices": "No invoices are made",
@@ -68,10 +69,10 @@
   "new_invoice": "New invoice",
   "contract_successfully_deleted": "Contract successfully deleted!",
   "failed_to_delete_contract": "Failed to delete contract!",
-  "status_of_the_contract": "Status of the contract: ",
-  "address_of_the_organization": "Address of the organization: ",
-  "itn_iec_of_the_organization": "ITN/IEC of the organization: ",
-  "created_at": "Created at: ",
+  "status_of_the_contract": "Status of the contract",
+  "address_of_the_organization": "Address of the organization",
+  "itn_iec_of_the_organization": "ITN/IEC of the organization",
+  "created_at": "Created at",
   "delete_contract": "Delete contract",
   "create_contract": "Create Contract",
   "other_contracts_with": "Other contracts with",
@@ -85,7 +86,10 @@
   "sun": "Sun",
   "please_select_all_fields": "Please fill all fields",
   "filtered_results": "Filtered Results",
+  "clear_filter": "Clear Filter",
   "type_comment": "Type a comment",
   "leave_comment_while": "Leave a comment, why are you deleting this contract?",
-  "service": "Service"
+  "service": "Service",
+  "no_saved_contracts": "No saved contracts",
+  "choose_language": "Choose language"
 }

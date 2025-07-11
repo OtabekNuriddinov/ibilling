@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-
 import '../barrel.dart';
 
 class CustomBottomAppbar extends StatelessWidget {
@@ -7,7 +6,6 @@ class CustomBottomAppbar extends StatelessWidget {
   final int currentIndex;
   final VoidCallback? onNewPressed;
   const CustomBottomAppbar({super.key, required this.onChanged, required this.currentIndex, this.onNewPressed});
-
 
   @override
   Widget build(BuildContext context) {
