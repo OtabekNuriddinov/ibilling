@@ -173,7 +173,6 @@ sealed class AppDialogs {
   }
 
 
-  /// Reusable method for language option
   static Widget _buildLanguageOption({
     required BuildContext context,
     required int selectedLangInDialog,
