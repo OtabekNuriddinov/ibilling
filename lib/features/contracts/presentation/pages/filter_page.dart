@@ -69,6 +69,10 @@ class _FilterPageState extends State<FilterPage> {
               fromDate: fromDate,
               toDate: toDate,
             );
+            
+            // Check if any filters are applied
+            final hasActiveFilters = paid || rejectedByIQ || inProcess || rejectedByPayme || fromDate != null || toDate != null;
+            
             return Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 28),
               child: Column(
@@ -186,12 +190,7 @@ class _FilterPageState extends State<FilterPage> {
                         ),
                       ),
                     )
-                  else if (paid ||
-                      rejectedByIQ ||
-                      inProcess ||
-                      rejectedByPayme ||
-                      fromDate != null ||
-                      toDate != null)
+                  else if (hasActiveFilters)
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 16),
                       child: Text(
@@ -218,35 +217,29 @@ class _FilterPageState extends State<FilterPage> {
                       Expanded(
                         child: CustomButton(
                           text: "apply_filters".tr(),
-                          textColor: filteredContracts.isNotEmpty
-                              ? AppColors.white7
-                              : AppColors.white7.withAlpha(70),
-                          backColor: filteredContracts.isNotEmpty
-                              ? AppColors.darkGreen
-                              : AppColors.darkGreen.withAlpha(70),
-                          onTap: filteredContracts.isNotEmpty
-                              ? () {
-                                  final filteredList = filteredContracts
-                                      .map(
-                                        (e) => ContractEntity(
-                                          id: e.id,
-                                          personType: e.personType,
-                                          fullName: e.fullName,
-                                          address: e.address,
-                                          inn: e.inn,
-                                          amount: e.amount,
-                                          lastInvoiceNumber:
-                                              e.lastInvoiceNumber,
-                                          numberOfInvoices: e.numberOfInvoices,
-                                          date: e.date,
-                                          status: e.status,
-                                          statusLabel: e.statusLabel,
-                                        ),
-                                      )
-                                      .toList();
-                                  context.go('/contracts', extra: filteredList);
-                                }
-                              : null,
+                          textColor: AppColors.white7,
+                          backColor: AppColors.darkGreen,
+                          onTap: () {
+                            final filteredList = filteredContracts
+                                .map(
+                                  (e) => ContractEntity(
+                                    id: e.id,
+                                    personType: e.personType,
+                                    fullName: e.fullName,
+                                    address: e.address,
+                                    inn: e.inn,
+                                    amount: e.amount,
+                                    lastInvoiceNumber:
+                                        e.lastInvoiceNumber,
+                                    numberOfInvoices: e.numberOfInvoices,
+                                    date: e.date,
+                                    status: e.status,
+                                    statusLabel: e.statusLabel,
+                                  ),
+                                )
+                                .toList();
+                            context.go('/contracts', extra: filteredList);
+                          },
                         ),
                       ),
                     ],

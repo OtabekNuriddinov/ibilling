@@ -87,7 +87,11 @@ class _HistoryPageState extends State<HistoryPage> {
                     fromDate: fromDate,
                     toDate: toDate,
                   );
-                  if(fromDate == null && toDate == null){
+                  
+                  // Check if any date filters are applied
+                  final hasDateFilters = fromDate != null || toDate != null;
+                  
+                  if (!hasDateFilters) {
                     return Center(
                       child: NoMadeWidget(
                         text: "no_history_for_this_period".tr(),
@@ -95,6 +99,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       ),
                     );
                   }
+                  
                   if (filteredContracts.isEmpty) {
                     return Center(
                       child: NoMadeWidget(
@@ -103,6 +108,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       ),
                     );
                   }
+                  
                   return ListView.builder(
                     itemCount: filteredContracts.length,
                     itemBuilder: (context, index) {
@@ -137,20 +143,19 @@ class _HistoryPageState extends State<HistoryPage> {
     DateTime firstDate = DateTime(2000);
     DateTime lastDate = DateTime(2100);
 
-    if(isFrom){
-      if(toDate != null){
+    if (isFrom) {
+      if (toDate != null) {
         lastDate = toDate!;
       }
-      if(fromDate != null){
+      if (fromDate != null) {
         initialDate = fromDate!;
       }
-    }
-    else{
-      if(fromDate != null){
-         firstDate = fromDate!;
-         initialDate = fromDate!;
+    } else {
+      if (fromDate != null) {
+        firstDate = fromDate!;
+        initialDate = fromDate!;
       }
-      if(toDate != null){
+      if (toDate != null) {
         initialDate = toDate!;
       }
     }
@@ -174,11 +179,13 @@ class _HistoryPageState extends State<HistoryPage> {
         );
       },
     );
+    
     if (picked != null) {
       setState(() {
         if (isFrom) {
           fromDate = picked;
-          if(toDate != null && picked.isAfter(toDate!)){
+          // If fromDate is after toDate, clear toDate
+          if (toDate != null && picked.isAfter(toDate!)) {
             toDate = null;
           }
         } else {

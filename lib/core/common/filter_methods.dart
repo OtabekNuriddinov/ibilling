@@ -87,18 +87,13 @@ class FilterMethods {
       final contractDate = DateTime(contract.date.year, contract.date.month, contract.date.day);
 
       if (from != null && to == null) {
-        dateMatches = contractDate == from;
+        dateMatches = contractDate.isAtSameMomentAs(from);
       } else if (from == null && to != null) {
-        dateMatches = contractDate == to;
+        dateMatches = contractDate.isAtSameMomentAs(to);
       } else if (from != null && to != null) {
-        if (from == to) {
-          dateMatches = contractDate == from;
-        } else {
-          dateMatches = (contractDate.isAtSameMomentAs(from) || contractDate.isAfter(from)) &&
-                        (contractDate.isAtSameMomentAs(to) || contractDate.isBefore(to));
-        }
+        dateMatches = (contractDate.isAtSameMomentAs(from) || contractDate.isAfter(from)) &&
+                      (contractDate.isAtSameMomentAs(to) || contractDate.isBefore(to));
       }
-      // Aks holda (ikkalasi null) dateMatches true bo‘lib qoladi
 
       return statusMatches && dateMatches;
     }).toList();
