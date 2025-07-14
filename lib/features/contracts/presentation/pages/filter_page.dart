@@ -51,11 +51,11 @@ class _FilterPageState extends State<FilterPage> {
         ),
         body: BlocBuilder<ContractBloc, ContractState>(
           builder: (context, state) {
-            if (state.isLoading) {
-              return Center(child: CircularProgressIndicator());
+            if (state.status == ContractListStatus.loading) {
+              return const Center(child: CircularProgressIndicator());
             }
-            if (state.error != null) {
-              return Center(child: Text('Error: ${state.error}'));
+            if (state.status == ContractListStatus.failure) {
+              return Center(child: Text('Error:  ${state.error ?? "Unknown error"}'));
             }
             final allContracts = state.contracts;
             final filteredContracts = FilterMethods.applyFilters(

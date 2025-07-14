@@ -6,47 +6,49 @@ import 'package:ibilling/features/ibilling/domain/entities/invoice_entity.dart';
 import '../../domain/repositories/contract_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class IBillingRemoteDataSource implements ContractRepository {
+class IBillingRemoteDataSource{
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  @override
   Future<void> addContract(ContractEntity contract) async {
+    try {
     final contractModel = ContractModel.fromEntity(contract);
     final contractMap = contractModel.toJson();
     final newId = DateTime.now().millisecondsSinceEpoch.toString();
     contractMap['id'] = newId;
-    try {
       final docRef = await FirebaseFirestore.instance.collection('contracts').add(contractMap);
     } catch (e) {
       debugPrint("Something went wrong: $e");
     }
   }
 
-  @override
   Future<List<ContractEntity>> fetchContracts() async {
-    final querySnapshot = await firestore.collection('contracts').get();
-    debugPrint('Fetched \\${querySnapshot.docs.length} contracts from Firestore');
-    final contracts = querySnapshot.docs
-        .map((doc) {
-      try {
-        final model = ContractModel.fromJson(doc.data());
-        debugPrint('Loaded contract: \\${model.fullName}');
-        return model;
-      } catch (e) {
-        debugPrint('Error parsing contract: \\$e');
-        return null;
-      }
-    })
-        .whereType<ContractModel>()
-        .toList();
-    
-    contracts.sort((a, b) => (int.tryParse(b.id ?? '0') ?? 0).compareTo(int.tryParse(a.id ?? '0') ?? 0));
+    try{
+      final querySnapshot = await firestore.collection('contracts').get();
+      debugPrint('Fetched \\${querySnapshot.docs.length} contracts from Firestore');
+      final contracts = querySnapshot.docs
+          .map((doc) {
+        try {
+          final model = ContractModel.fromJson(doc.data());
+          debugPrint('Loaded contract: \\${model.fullName}');
+          return model;
+        } catch (e) {
+          debugPrint('Error parsing contract: \\$e');
+          return null;
+        }
+      })
+          .whereType<ContractModel>()
+          .toList();
 
-    debugPrint('Returning \\${contracts.length} contracts');
-    return contracts;
+      contracts.sort((a, b) => (int.tryParse(b.id ?? '0') ?? 0).compareTo(int.tryParse(a.id ?? '0') ?? 0));
+
+      debugPrint('Returning \\${contracts.length} contracts');
+      return contracts;
+    }catch(e){
+      debugPrint("Error fetching contracts: $e");
+      return [];
+    }
   }
 
-  @override
   Future<void> deleteContract(String id) async {
     try {
       final idStr = id;
@@ -66,11 +68,15 @@ class IBillingRemoteDataSource implements ContractRepository {
   }
 
   Future<void> addInvoice(InvoiceEntity invoice) async {
-    final invoiceModel = InvoiceModel.fromEntity(invoice);
-    final invoiceMap = invoiceModel.toJson();
-    final newId = DateTime.now().millisecondsSinceEpoch.toString();
-    invoiceMap['id'] = newId;
-    try{
+    try {
+      final invoiceModel = InvoiceModel.fromEntity(invoice);
+      final invoiceMap = invoiceModel.toJson();
+      final newId = DateTime
+          .now()
+          .millisecondsSinceEpoch
+          .toString();
+      invoiceMap['id'] = newId;
+
       final docRef = await firestore.collection('invoices').add(invoiceMap);
     }catch(e){
       debugPrint("Something went wrong: $e");
@@ -78,8 +84,8 @@ class IBillingRemoteDataSource implements ContractRepository {
   }
 
   Future<List<InvoiceEntity>> fetchInvoices() async {
-    final querySnapshot = await firestore.collection('invoices').get();
     try{
+    final querySnapshot = await firestore.collection('invoices').get();
       final invoices = querySnapshot.docs
           .map((doc) => InvoiceModel.fromJson(doc.data()))
           .toList();

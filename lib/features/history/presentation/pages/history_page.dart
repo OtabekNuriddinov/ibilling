@@ -13,6 +13,12 @@ class _HistoryPageState extends State<HistoryPage> {
   DateTime? toDate;
 
   @override
+  void initState() {
+    super.initState();
+    context.read<ContractBloc>().add(FetchContracts());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CommonMethods.customAppBar(
@@ -32,51 +38,46 @@ class _HistoryPageState extends State<HistoryPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-             Text(
-                "date".tr(),
-                style: AppTextStyles.filterAboveTextStyle.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700
-                ),
+            Text(
+              "date".tr(),
+              style: AppTextStyles.filterAboveTextStyle.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w700
               ),
+            ),
             const SizedBox(height: 10),
-             Row(
-                children: [
-                  DateSelectable(
-                      label: 'from'.tr(),
-                      date: fromDate,
-                      onPressed: () => _selectDate(context, true),
-                    ),
-
-                  const SizedBox(width: 16),
-                  Text(
-                    '-',
-                    style: TextStyle(
-                      color: Colors.white.withAlpha(100),
-                      fontSize: 26.sp,
-                    ),
+            Row(
+              children: [
+                DateSelectable(
+                  label: 'from'.tr(),
+                  date: fromDate,
+                  onPressed: () => _selectDate(context, true),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  '-',
+                  style: TextStyle(
+                    color: Colors.white.withAlpha(100),
+                    fontSize: 26.sp,
                   ),
-                  const SizedBox(width: 16),
-                   DateSelectable(
-                      label: 'to'.tr(),
-                      date: toDate,
-                      onPressed: () => _selectDate(context, false),
-                    ),
-
-                ],
-              ),
-
+                ),
+                const SizedBox(width: 16),
+                DateSelectable(
+                  label: 'to'.tr(),
+                  date: toDate,
+                  onPressed: () => _selectDate(context, false),
+                ),
+              ],
+            ),
             const SizedBox(height: 8),
             Expanded(
               child: BlocBuilder<ContractBloc, ContractState>(
                 builder: (context, state) {
-                  if (state.isLoading) {
-                    return Center(child: CircularProgressIndicator());
+                  if (state.status == ContractListStatus.loading) {
+                    return const Center(child: CircularProgressIndicator());
                   }
-                  if (state.error != null) {
-                    return Center(
-                      child: Text('${"error".tr()}: ${state.error}'),
-                    );
+                  if (state.status == ContractListStatus.failure) {
+                    return Center(child: Text('Error:  ${state.error ?? "Unknown error"}'));
                   }
                   final filteredContracts = FilterMethods.applyFilters(
                     allContracts: state.contracts.map((e) => ContractModel.fromEntity(e)).toList(),
@@ -87,10 +88,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     fromDate: fromDate,
                     toDate: toDate,
                   );
-                  
-                  // Check if any date filters are applied
                   final hasDateFilters = fromDate != null || toDate != null;
-                  
                   if (!hasDateFilters) {
                     return Center(
                       child: NoMadeWidget(
@@ -99,7 +97,6 @@ class _HistoryPageState extends State<HistoryPage> {
                       ),
                     );
                   }
-                  
                   if (filteredContracts.isEmpty) {
                     return Center(
                       child: NoMadeWidget(
@@ -108,7 +105,6 @@ class _HistoryPageState extends State<HistoryPage> {
                       ),
                     );
                   }
-                  
                   return ListView.builder(
                     itemCount: filteredContracts.length,
                     itemBuilder: (context, index) {
@@ -121,8 +117,7 @@ class _HistoryPageState extends State<HistoryPage> {
                             "/history/history_contract_details",
                             extra: {
                               "contract": contract,
-                              "displayIndex":
-                                  int.tryParse(contract.id ?? '0') ?? 0,
+                              "displayIndex": int.tryParse(contract.id ?? '0') ?? 0,
                             },
                           );
                         },

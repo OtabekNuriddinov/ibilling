@@ -9,9 +9,10 @@ class ContractsPage extends StatefulWidget {
   State<ContractsPage> createState() => _ContractsPageState();
 }
 
-class _ContractsPageState extends State<ContractsPage> with SingleTickerProviderStateMixin{
-  DateTime _focusedDay = DateTime.now();
-  DateTime _selectedDay = DateTime.now();
+class _ContractsPageState extends State<ContractsPage>
+    with SingleTickerProviderStateMixin {
+  late DateTime _focusedDay;
+  late DateTime _selectedDay;
   int selectedIndex = 0;
   late List<ContractEntity> _contracts = [];
   bool _isLoading = false;
@@ -19,11 +20,9 @@ class _ContractsPageState extends State<ContractsPage> with SingleTickerProvider
   int _currentPage = 1;
   final int _pageSize = 10;
   bool isTab = false;
-  String? _error;
   final ScrollController _scrollController = ScrollController();
   final List<InvoiceEntity> _invoices = [];
   bool _isInvoiceLoading = false;
-  String? _invoiceError;
   int _invoicePage = 1;
   final int _invoicePageSize = 10;
   bool _hasReachedMaxInvoices = false;
@@ -34,18 +33,19 @@ class _ContractsPageState extends State<ContractsPage> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
+    _focusedDay = DateTime.now();
+    _selectedDay = DateTime.now();
     _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener((){
-      if(_tabController.indexIsChanging) return;
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) return;
       setState(() {
         selectedIndex = _tabController.index;
-        if(selectedIndex == 0){
+        if (selectedIndex == 0) {
           _contracts.clear();
           _currentPage = 1;
           _hasReachedMax = false;
           _loadContracts();
-        }
-        else{
+        } else {
           _invoices.clear();
           _invoicePage = 1;
           _hasReachedMaxInvoices = false;
@@ -166,79 +166,81 @@ class _ContractsPageState extends State<ContractsPage> with SingleTickerProvider
                   children: [
                     shouldShowTab
                         ? Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                            height: 40,
-                            width: 240,
-                            decoration: BoxDecoration(
-                              color: AppColors.black,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: TabBar(
-                              controller: _tabController,
-                              indicator: BoxDecoration(
-                                color: AppColors.lightGreen,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              indicatorSize: TabBarIndicatorSize.tab,
-                              indicatorPadding: EdgeInsets.zero,
-                              dividerColor: Colors.transparent,
-                              labelColor: AppColors.white,
-                              unselectedLabelColor: AppColors.white,
-                              labelStyle: TextStyle(
-                                fontFamily: 'Ubuntu',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              unselectedLabelStyle: TextStyle(
-                                fontFamily: 'Ubuntu',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              tabs: [
-                                Tab(text: "contracts".tr()),
-                                Tab(text: "invoice".tr()),
-                              ],
-                            ),
-                          ),
-                        if (_isFilterApplied)
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 16),
-                              child: TextButton(
-                                onPressed: _clearFilter,
-                                child: Text(
-                                  "clear_filter".tr(),
-                                  style: TextStyle(
-                                    color: AppColors.darkGreen,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                height: 40,
+                                width: 240,
+                                decoration: BoxDecoration(
+                                  color: AppColors.black,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: TabBar(
+                                  controller: _tabController,
+                                  indicator: BoxDecoration(
+                                    color: AppColors.lightGreen,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  indicatorSize: TabBarIndicatorSize.tab,
+                                  indicatorPadding: EdgeInsets.zero,
+                                  dividerColor: Colors.transparent,
+                                  labelColor: AppColors.white,
+                                  unselectedLabelColor: AppColors.white,
+                                  labelStyle: TextStyle(
                                     fontFamily: 'Ubuntu',
-                                    fontSize: 10,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                   ),
+                                  unselectedLabelStyle: TextStyle(
+                                    fontFamily: 'Ubuntu',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  tabs: [
+                                    Tab(text: "contracts".tr()),
+                                    Tab(text: "invoice".tr()),
+                                  ],
                                 ),
                               ),
-                            ),
-                          ),
-                      ],
-                    )
+                              if (_isFilterApplied)
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 16),
+                                    child: TextButton(
+                                      onPressed: _clearFilter,
+                                      child: Text(
+                                        "clear_filter".tr(),
+                                        style: TextStyle(
+                                          color: AppColors.darkGreen,
+                                          fontFamily: 'Ubuntu',
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          )
                         : SizedBox.shrink(),
                     SizedBox(height: 8),
                     selectedIndex == 0
                         ? ContractsListWidget(
-                      isLoading: _isLoading,
-                      contracts: _contracts,
-                      hasReachedMax: _hasReachedMax,
-                      onLoadMore: _isFilterApplied ? null : _loadContracts,
-                      onRefresh: _onRefresh,
-                    )
+                            isLoading: _isLoading,
+                            contracts: _contracts,
+                            hasReachedMax: _hasReachedMax,
+                            onLoadMore: _isFilterApplied
+                                ? null
+                                : _loadContracts,
+                            onRefresh: _onRefresh,
+                          )
                         : InvoicesListWidget(
-                      isLoading: _isInvoiceLoading,
-                      invoices: _invoices,
-                      hasReachedMax: _hasReachedMaxInvoices,
-                      onLoadMore: _loadInvoices,
-                      onRefresh: _onRefreshInvoices,
-                    ),
+                            isLoading: _isInvoiceLoading,
+                            invoices: _invoices,
+                            hasReachedMax: _hasReachedMaxInvoices,
+                            onLoadMore: _loadInvoices,
+                            onRefresh: _onRefreshInvoices,
+                          ),
                   ],
                 ),
               ),
@@ -254,29 +256,38 @@ class _ContractsPageState extends State<ContractsPage> with SingleTickerProvider
     setState(() => _isLoading = true);
     try {
       final getContracts = getIt<GetContracts>();
-      final allContracts = await getContracts();
-      final filtered = allContracts.where((contract) {
-        return contract.date.year == _selectedDay.year &&
-            contract.date.month == _selectedDay.month &&
-            contract.date.day == _selectedDay.day;
-      }).toList();
-      filtered.sort(
+      final result = await getContracts();
+      result.fold(
+        (failure) {
+          setState(() {
+            _isLoading = false;
+            debugPrint(failure.message);
+          });
+        },
+        (allContracts) {
+          final filtered = allContracts.where((contract) {
+            return contract.date.year == _selectedDay.year &&
+                contract.date.month == _selectedDay.month &&
+                contract.date.day == _selectedDay.day;
+          }).toList();
+          filtered.sort(
             (a, b) => (int.tryParse(a.id ?? '0') ?? 0).compareTo(
-          int.tryParse(b.id ?? '0') ?? 0,
-        ),
+              int.tryParse(b.id ?? '0') ?? 0,
+            ),
+          );
+          final start = (_currentPage - 1) * _pageSize;
+          final newContracts = filtered.skip(start).take(_pageSize).toList();
+          setState(() {
+            _contracts.addAll(newContracts);
+            _isLoading = false;
+            _currentPage++;
+            if (newContracts.length < _pageSize) _hasReachedMax = true;
+          });
+        },
       );
-      final start = (_currentPage - 1) * _pageSize;
-      final newContracts = filtered.skip(start).take(_pageSize).toList();
-      setState(() {
-        _contracts.addAll(newContracts);
-        _isLoading = false;
-        _currentPage++;
-        if (newContracts.length < _pageSize) _hasReachedMax = true;
-      });
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _error = e.toString();
       });
     }
   }
@@ -287,7 +298,6 @@ class _ContractsPageState extends State<ContractsPage> with SingleTickerProvider
       _contracts.clear();
       _currentPage = 1;
       _hasReachedMax = false;
-      _error = null;
     });
     await _loadContracts();
   }
@@ -296,31 +306,42 @@ class _ContractsPageState extends State<ContractsPage> with SingleTickerProvider
     setState(() => _isInvoiceLoading = true);
     try {
       final getInvoices = getIt<GetInvoices>();
-      final allInvoices = await getInvoices();
-      final filtered = allInvoices.where((invoice) {
-        return invoice.date.year == _selectedDay.year &&
-            invoice.date.month == _selectedDay.month &&
-            invoice.date.day == _selectedDay.day;
-      }).toList();
-      filtered.sort(
+      final result = await getInvoices();
+      result.fold(
+        (failure) {
+          setState(() {
+            _isInvoiceLoading = false;
+            debugPrint(failure.message);
+          });
+        },
+        (allInvoices) {
+          final filtered = allInvoices.where((invoice) {
+            return invoice.date.year == _selectedDay.year &&
+                invoice.date.month == _selectedDay.month &&
+                invoice.date.day == _selectedDay.day;
+          }).toList();
+          filtered.sort(
             (a, b) => (int.tryParse(a.id ?? "0") ?? 0).compareTo(
-          int.tryParse(b.id ?? "0") ?? 0,
-        ),
+              int.tryParse(b.id ?? "0") ?? 0,
+            ),
+          );
+          final start = (_invoicePage - 1) * _invoicePageSize;
+          final newInvoices = filtered
+              .skip(start)
+              .take(_invoicePageSize)
+              .toList();
+          setState(() {
+            _invoices.addAll(newInvoices);
+            _isInvoiceLoading = false;
+            _invoicePage++;
+            if (newInvoices.length < _invoicePageSize)
+              _hasReachedMaxInvoices = true;
+          });
+        },
       );
-      final start = (_invoicePage - 1) * _invoicePageSize;
-      final newInvoices = filtered.skip(start).take(_invoicePageSize).toList();
-      setState(() {
-        _invoices.addAll(newInvoices);
-        _isInvoiceLoading = false;
-        _invoicePage++;
-        if (newInvoices.length < _invoicePageSize)
-          _hasReachedMaxInvoices = true;
-        _invoiceError = null;
-      });
     } catch (e) {
       setState(() {
         _isInvoiceLoading = false;
-        _invoiceError = e.toString();
       });
     }
   }
@@ -330,7 +351,6 @@ class _ContractsPageState extends State<ContractsPage> with SingleTickerProvider
       _invoices.clear();
       _invoicePage = 1;
       _hasReachedMaxInvoices = false;
-      _invoiceError = null;
     });
     await _loadInvoices();
   }
@@ -353,6 +373,7 @@ class _ContractsPageState extends State<ContractsPage> with SingleTickerProvider
       }
     });
   }
+
   void _handleScrollPadding() {
     double newPadding = _scrollController.offset > 0 ? 0 : 32;
     if (_topPadding != newPadding) {

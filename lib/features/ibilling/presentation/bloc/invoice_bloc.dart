@@ -15,23 +15,54 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
     on<FetchInvoicesEvent>(_fetchInvoicesFunc);
   }
 
-  Future<void> _addInvoiceFunc(AddInvoiceEvent event, Emitter<InvoiceState> emit) async {
+  Future<void> _addInvoiceFunc(
+    AddInvoiceEvent event,
+    Emitter<InvoiceState> emit,
+  ) async {
     emit(state.copyWith(status: InvoiceListStatus.loading));
-    try {
-      await addInvoice(event.invoice);
-      emit(state.copyWith(status: InvoiceListStatus.success));
-    } catch (e) {
-      emit(state.copyWith(status: InvoiceListStatus.failure, error: e.toString()));
-    }
+
+    final addResult = await addInvoice(event.invoice);
+
+    addResult.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: InvoiceListStatus.failure,
+          error: failure.message,
+        ),
+      ),
+      (_) async {
+        final invoicesResult = await getInvoices();
+        invoicesResult.fold(
+          (failure) => emit(state.copyWith()),
+          (invoices) => emit(
+            state.copyWith(
+              invoices: invoices,
+              status: InvoiceListStatus.success,
+              error: null,
+            ),
+          ),
+        );
+      },
+    );
   }
 
-  Future<void> _fetchInvoicesFunc(FetchInvoicesEvent event, Emitter<InvoiceState> emit) async {
+  Future<void> _fetchInvoicesFunc(
+    FetchInvoicesEvent event,
+    Emitter<InvoiceState> emit,
+  ) async {
     emit(state.copyWith(status: InvoiceListStatus.loading));
-    try {
-      final invoices = await getInvoices();
-      emit(state.copyWith(invoices: invoices, status: InvoiceListStatus.success));
-    } catch (e) {
-      emit(state.copyWith(status: InvoiceListStatus.failure, error: e.toString()));
-    }
+
+    final result = await getInvoices();
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: InvoiceListStatus.failure,
+          error: failure.message,
+        ),
+      ),
+      (invoices) => emit(
+        state.copyWith(invoices: invoices, status: InvoiceListStatus.success),
+      ),
+    );
   }
 }
