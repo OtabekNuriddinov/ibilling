@@ -42,7 +42,7 @@ class _HistoryPageState extends State<HistoryPage> {
               "date".tr(),
               style: AppTextStyles.filterAboveTextStyle.copyWith(
                 fontSize: 14,
-                fontWeight: FontWeight.w700
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 10),
@@ -74,13 +74,21 @@ class _HistoryPageState extends State<HistoryPage> {
               child: BlocBuilder<ContractBloc, ContractState>(
                 builder: (context, state) {
                   if (state.status == ContractListStatus.loading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.lightGreen,
+                      ),
+                    );
                   }
                   if (state.status == ContractListStatus.failure) {
-                    return Center(child: Text('Error:  ${state.error ?? "Unknown error"}'));
+                    return Center(
+                      child: Text('Error:  ${state.error ?? "Unknown error"}'),
+                    );
                   }
                   final filteredContracts = FilterMethods.applyFilters(
-                    allContracts: state.contracts.map((e) => ContractModel.fromEntity(e)).toList(),
+                    allContracts: state.contracts
+                        .map((e) => ContractModel.fromEntity(e))
+                        .toList(),
                     paid: false,
                     rejectedByIQ: false,
                     inProcess: false,
@@ -117,7 +125,8 @@ class _HistoryPageState extends State<HistoryPage> {
                             "/history/history_contract_details",
                             extra: {
                               "contract": contract,
-                              "displayIndex": int.tryParse(contract.id ?? '0') ?? 0,
+                              "displayIndex":
+                                  int.tryParse(contract.id ?? '0') ?? 0,
                             },
                           );
                         },
@@ -174,7 +183,7 @@ class _HistoryPageState extends State<HistoryPage> {
         );
       },
     );
-    
+
     if (picked != null) {
       setState(() {
         if (isFrom) {

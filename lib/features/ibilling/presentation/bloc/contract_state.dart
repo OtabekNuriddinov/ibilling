@@ -1,7 +1,6 @@
 part of 'contract_bloc.dart';
 
-enum ContractListStatus {initial, loading, success, failure}
-
+enum ContractListStatus { initial, loading, success, failure }
 enum ContractAction { none, add, delete, refresh, fetch }
 
 class ContractState {
@@ -26,11 +25,13 @@ class ContractState {
     ContractListStatus? status,
     ContractAction? lastAction,
   }) {
+    // Reset error if status is not failure
+    final newStatus = status ?? this.status;
     return ContractState(
       contracts: contracts ?? this.contracts,
       isLoading: isLoading ?? this.isLoading,
-      error: error,
-      status: status ?? this.status,
+      error: newStatus == ContractListStatus.failure ? (error ?? this.error) : null,
+      status: newStatus,
       lastAction: lastAction ?? this.lastAction,
     );
   }

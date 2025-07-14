@@ -52,7 +52,7 @@ class _FilterPageState extends State<FilterPage> {
         body: BlocBuilder<ContractBloc, ContractState>(
           builder: (context, state) {
             if (state.status == ContractListStatus.loading) {
-              return const Center(child: CircularProgressIndicator());
+              return Center(child: CircularProgressIndicator(color: AppColors.lightGreen),);
             }
             if (state.status == ContractListStatus.failure) {
               return Center(child: Text('Error:  ${state.error ?? "Unknown error"}'));
@@ -69,8 +69,7 @@ class _FilterPageState extends State<FilterPage> {
               fromDate: fromDate,
               toDate: toDate,
             );
-            
-            // Check if any filters are applied
+
             final hasActiveFilters = paid || rejectedByIQ || inProcess || rejectedByPayme || fromDate != null || toDate != null;
             
             return Padding(

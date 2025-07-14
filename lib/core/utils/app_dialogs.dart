@@ -263,7 +263,7 @@ sealed class AppDialogs {
                           textColor: AppColors.white7,
                           backColor: AppColors.red,
                           onTap: () {
-                            Navigator.pop(context, controller.text.trim());
+                            Navigator.pop(context, controller.text);
                           },
                         ),
                       ),

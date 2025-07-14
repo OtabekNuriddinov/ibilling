@@ -23,15 +23,14 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
     FetchContracts event,
     Emitter<ContractState> emit,
   ) async {
-    if (state.contracts.isNotEmpty) return;
     emit(
       state.copyWith(
         isLoading: true,
         error: null,
         status: ContractListStatus.loading,
+        lastAction: ContractAction.fetch,
       ),
     );
-
     final result = await getContracts();
     result.fold(
       (failure) => emit(
@@ -39,6 +38,7 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
           isLoading: false,
           error: failure.message,
           status: ContractListStatus.failure,
+          lastAction: ContractAction.fetch,
         ),
       ),
       (contracts) => emit(
@@ -46,6 +46,7 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
           contracts: contracts,
           isLoading: false,
           status: ContractListStatus.success,
+          lastAction: ContractAction.fetch,
         ),
       ),
     );
@@ -60,6 +61,7 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
         isLoading: true,
         error: null,
         status: ContractListStatus.loading,
+        lastAction: ContractAction.refresh,
       ),
     );
     final result = await getContracts();
@@ -69,6 +71,7 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
           isLoading: false,
           error: failure.message,
           status: ContractListStatus.failure,
+          lastAction: ContractAction.refresh,
         ),
       ),
       (contracts) => emit(
@@ -76,6 +79,7 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
           contracts: contracts,
           isLoading: false,
           status: ContractListStatus.success,
+          lastAction: ContractAction.refresh,
         ),
       ),
     );
@@ -90,16 +94,17 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
         isLoading: true,
         error: null,
         status: ContractListStatus.loading,
-        lastAction: ContractAction.none,
+        lastAction: ContractAction.add,
       ),
     );
     final addResult = await addContract(event.contract);
-    addResult.fold(
-      (failure) => emit(
+    await addResult.fold(
+      (failure) async => emit(
         state.copyWith(
           isLoading: false,
           error: failure.message,
           status: ContractListStatus.failure,
+          lastAction: ContractAction.add,
         ),
       ),
       (_) async {
@@ -110,6 +115,7 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
               isLoading: false,
               error: failure.message,
               status: ContractListStatus.failure,
+              lastAction: ContractAction.add,
             ),
           ),
           (contracts) => emit(
@@ -117,6 +123,7 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
               contracts: contracts,
               isLoading: false,
               status: ContractListStatus.success,
+              lastAction: ContractAction.add,
             ),
           ),
         );
@@ -133,16 +140,17 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
         isLoading: true,
         error: null,
         status: ContractListStatus.loading,
-        lastAction: ContractAction.none,
+        lastAction: ContractAction.delete,
       ),
     );
     final deleteResult = await deleteContract(event.id);
-    deleteResult.fold(
-      (failure) => emit(
+    await deleteResult.fold(
+      (failure) async => emit(
         state.copyWith(
           isLoading: false,
           error: failure.message,
           status: ContractListStatus.failure,
+          lastAction: ContractAction.delete,
         ),
       ),
       (_) async {
@@ -153,6 +161,7 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
               isLoading: false,
               error: failure.message,
               status: ContractListStatus.failure,
+              lastAction: ContractAction.delete,
             ),
           ),
           (contracts) => emit(

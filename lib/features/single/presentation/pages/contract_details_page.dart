@@ -57,21 +57,17 @@ class _ContractDetailsPageState extends State<ContractDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<ContractBloc, ContractState>(
-      listener: (context, state) async{
+      listener: (context, state) async {
         if (state.status == ContractListStatus.success && state.lastAction == ContractAction.delete) {
           await IBillingLocalDataSource.removeSavedContract(widget.contract.id!);
-          AppSnackBar.showSnackBar(
-            context,
-            "contract_successfully_deleted".tr(),
-          );
-          Future.delayed(Duration(milliseconds: 500), () {
-            if (mounted) {
-              context.go('/contracts');
-            }
-          });
+          AppSnackBar.showSnackBar(context, "${"contract_successfully_deleted".tr()}");
+          await Future.delayed(const Duration(milliseconds: 700));
+          if (mounted) {
+            context.go('/contracts');
+          }
         }
-        if (state.status == ContractListStatus.failure) {
-          debugPrint("failed_to_delete_contract".tr());
+        if (state.status == ContractListStatus.failure && state.lastAction == ContractAction.delete) {
+          AppSnackBar.showSnackBar(context, "${"failed_to_delete_contract".tr()}");
         }
       },
       child: Scaffold(
@@ -182,23 +178,28 @@ class _ContractDetailsPageState extends State<ContractDetailsPage> {
               Row(
                 children: [
                   Expanded(
-                    child: CustomButton(
-                      text: "delete_contract".tr(),
-                      textColor: AppColors.red,
-                      backColor: AppColors.red.withAlpha(50),
-                      onTap: () async {
-                        final comment =
-                        await AppDialogs.showDeleteCommentDialog(context);
-                        if (!mounted) return;
-                        if (comment != null &&
-                            widget.contract.id != null && comment.trim().isNotEmpty) {
-                          context.read<ContractBloc>().add(
-                            DeleteContractEvent(id: widget.contract.id!),
+                    child: BlocBuilder<ContractBloc, ContractState>(
+                      builder: (context, state) {
+                        if (state.status == ContractListStatus.loading && state.lastAction == ContractAction.delete) {
+                          return Center(child: CircularProgressIndicator(
+                            color: AppColors.lightGreen,
+                          ),
                           );
                         }
-                        else if(comment!=null && comment.trim().isEmpty){
-                          AppSnackBar.showSnackBar(context, "Please write a comment before deleting");
-                        }
+                        return CustomButton(
+                          text: "delete_contract".tr(),
+                          textColor: AppColors.red,
+                          backColor: AppColors.red.withAlpha(50),
+                          onTap: () async {
+                            final comment = await AppDialogs.showDeleteCommentDialog(context);
+                            if (!mounted) return;
+                            if (comment != null && widget.contract.id != null && comment.trim().isNotEmpty) {
+                              context.read<ContractBloc>().add(DeleteContractEvent(id: widget.contract.id!));
+                            } else if (comment != null && comment.trim().isEmpty) {
+                              AppSnackBar.showSnackBar(context, "Please write a comment before deleting");
+                            }
+                          },
+                        );
                       },
                     ),
                   ),
@@ -216,7 +217,7 @@ class _ContractDetailsPageState extends State<ContractDetailsPage> {
                 ],
               ),
               const SizedBox(height: 40),
-              if(context.locale == Locale('uz'))
+              if (context.locale == Locale('uz'))
                 Text(
                   "${widget.contract.fullName} ning\n${"other_contracts_with".tr()}",
                   style: AppTextStyles.numberTextStyle.copyWith(
@@ -232,23 +233,17 @@ class _ContractDetailsPageState extends State<ContractDetailsPage> {
                     color: AppColors.white2,
                   ),
                 ),
-
               const SizedBox(height: 20),
               BlocBuilder<ContractBloc, ContractState>(
                 builder: (context, state) {
                   final otherContracts = state.contracts
                       .where(
                         (c) =>
-                    c.fullName.trim().toLowerCase() ==
-                        widget.contract.fullName
-                            .trim()
-                            .toLowerCase() &&
-                        c.id != widget.contract.id,
-                  )
+                            c.fullName.trim().toLowerCase() ==
+                                widget.contract.fullName.trim().toLowerCase() &&
+                            c.id != widget.contract.id,
+                      )
                       .toList();
-                  if (state.isLoading) {
-                    return Center(child: CircularProgressIndicator());
-                  }
                   if (otherContracts.isEmpty) {
                     return Padding(
                       padding: EdgeInsets.only(left: 26.w, top: 6.h),
@@ -276,7 +271,7 @@ class _ContractDetailsPageState extends State<ContractDetailsPage> {
                         onPressed: () {
                           context.go('/contracts/contract_details', extra: {
                             'contract': contract,
-                            'displayIndex': int.tryParse(contract.id??"0") ?? 0
+                            'displayIndex': int.tryParse(contract.id ?? "0") ?? 0
                           });
                         },
                       );
@@ -285,7 +280,7 @@ class _ContractDetailsPageState extends State<ContractDetailsPage> {
                 },
               ),
             ],
-          )
+          ),
         ),
       ),
     );
